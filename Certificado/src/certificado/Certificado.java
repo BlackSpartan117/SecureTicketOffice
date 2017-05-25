@@ -9,6 +9,7 @@ package certificado;
 import java.io.*;
 import java.security.*;
 import java.security.spec.*;
+import java.util.Arrays;
 import javax.crypto.Cipher;
 
 public class Certificado {
@@ -38,9 +39,9 @@ public class Certificado {
                     /* Ejemplo de cifrar y descifrar con rsa */
                     String textoClaro = "Este es el mensaje original";
                     byte [] cifrado = certificado.encrypt(textoClaro, loadedKeyPair.getPublic());
-                    String recuperado = certificado.decrypt(cifrado, loadedKeyPair.getPrivate());
+                    byte []recuperado = certificado.decrypt(cifrado, loadedKeyPair.getPrivate());
                     System.out.println("Texto claro: " + textoClaro);
-                    System.out.println("Texto recuperado: " + recuperado);
+                    System.out.println("Texto recuperado: " + new String(recuperado));
                     
                 /* Generacion del certificado */
                     
@@ -75,6 +76,12 @@ public class Certificado {
                     fos.write("Firma:".getBytes());
                     fos.write(bytesFirma);
                     fos.close();
+                    
+                /* Verificacion de la autenticidad del certificado */
+                    byte []firmaDec = certificado.decrypt(bytesFirma, loadedKeyPair.getPublic());
+                    MessageDigest hash = MessageDigest.getInstance("SHA-256");
+                    byte[] bytesGerente = hash.digest(gerente.getBytes());
+                    System.out.println("Firma " + (Arrays.equals(firmaDec, bytesGerente) ? "valida" : "invalida"));
             } catch (Exception e) {
                     e.printStackTrace();
                     return;
@@ -176,7 +183,7 @@ public class Certificado {
         return cipherText;
     }
 
-    public String decrypt(byte[] datos, Key key) {
+    public byte []decrypt(byte[] datos, Key key) {
         byte[] dectyptedText = null;
         try {
           // get an RSA cipher object and print the provider
@@ -191,7 +198,7 @@ public class Certificado {
           System.exit(0);
         }
 
-        return new String(dectyptedText);
+        return dectyptedText;
     }
   
   public void guardarLlave(String path, Key llave) throws IOException {
