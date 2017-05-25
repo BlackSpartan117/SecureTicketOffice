@@ -21,21 +21,60 @@ public class Certificado {
                     KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
 
                     keyGen.initialize(2048);
+                    
+                    /* Generacion de la llave del banco */
                     KeyPair generatedKeyPair = keyGen.genKeyPair();
 
+                    /*Imprimir y guardar las llaves */
                     System.out.println("Generated Key Pair");
                     certificado.dumpKeyPair(generatedKeyPair);
                     certificado.SaveKeyPair(path, generatedKeyPair);
 
+                    /* Leer las llaves desde los arvhivos */
                     KeyPair loadedKeyPair = certificado.LoadKeyPair(path, "RSA");
                     System.out.println("Loaded Key Pair");
                     certificado.dumpKeyPair(loadedKeyPair);
                     
+                    /* Ejemplo de cifrar y descifrar con rsa */
                     String textoClaro = "Este es el mensaje original";
                     byte [] cifrado = certificado.encrypt(textoClaro, loadedKeyPair.getPublic());
                     String recuperado = certificado.decrypt(cifrado, loadedKeyPair.getPrivate());
                     System.out.println("Texto claro: " + textoClaro);
                     System.out.println("Texto recuperado: " + recuperado);
+                    
+                /* Generacion del certificado */
+                    
+                    // Datos del certificado
+                    String idCliente = "1001";
+                    String nombreCliente = "Raúl Martinez Galicia";
+                    String fechaNacimiento = "10/04/1984";
+                    //String llavePublica = "llave publica";
+                    String gerente = "Ignacio Suarez Hernandez";
+                    String firma = "la firma";
+                    
+                    /* Generacion de las llaves del cliente */
+                    KeyPair llavesDelCliente = keyGen.genKeyPair();
+                    certificado.guardarLlave(System.getProperty("user.dir") +   // Guardar lave privada
+                                            "/src/certificados/" + idCliente + 
+                                            ".key", llavesDelCliente.getPrivate());  
+                    
+                    /* Generacion de firma digital del gerente */
+                    MessageDigest md = MessageDigest.getInstance("SHA-256");
+                    byte[] mdbytes = md.digest(gerente.getBytes());
+                    byte []bytesFirma = certificado.encrypt(mdbytes, loadedKeyPair.getPrivate());
+                    
+                    /* Guardar certificado */
+                    File cer = new File(System.getProperty("user.dir") + "/src/certificados/" + idCliente + ".cer");
+                    FileOutputStream fos = new FileOutputStream(cer);
+                    fos.write(("Id:" + idCliente + "\n").getBytes());
+                    fos.write(("Cliente:" + nombreCliente + "\n").getBytes());
+                    fos.write(("Fecha de nacimiento:" + fechaNacimiento + "\n").getBytes());
+                    fos.write("Llave publica:".getBytes());
+                    fos.write(llavesDelCliente.getPublic().getEncoded());
+                    fos.write(("Gerente:" + gerente + "\n").getBytes());
+                    fos.write("Firma:".getBytes());
+                    fos.write(bytesFirma);
+                    fos.close();
             } catch (Exception e) {
                     e.printStackTrace();
                     return;
@@ -107,36 +146,58 @@ public class Certificado {
             return new KeyPair(publicKey, privateKey);
     }
     
-    public byte[] encrypt(String text, PublicKey key) {
-    byte[] cipherText = null;
-    try {
-      // get an RSA cipher object and print the provider
-      final Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-      // encrypt the plain text using the public key
-      cipher.init(Cipher.ENCRYPT_MODE, key);
-      cipherText = cipher.doFinal(text.getBytes());
-    } catch (Exception e) {
-      e.printStackTrace();
-      System.exit(0);
+    public byte[] encrypt(String text, Key key) {
+        byte[] cipherText = null;
+        try {
+          // get an RSA cipher object and print the provider
+          final Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+          // encrypt the plain text using the public key
+          cipher.init(Cipher.ENCRYPT_MODE, key);
+          cipherText = cipher.doFinal(text.getBytes());
+        } catch (Exception e) {
+          e.printStackTrace();
+          System.exit(0);
+        }
+        return cipherText;
     }
-    return cipherText;
-  }
-
-  public String decrypt(byte[] text, PrivateKey key) {
-    byte[] dectyptedText = null;
-    try {
-      // get an RSA cipher object and print the provider
-      final Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-
-      // decrypt the text using the private key
-      cipher.init(Cipher.DECRYPT_MODE, key);
-      dectyptedText = cipher.doFinal(text);
-
-    } catch (Exception ex) {
-      ex.printStackTrace();
-      System.exit(0);
+    
+    public byte[] encrypt(byte []datos, Key key) {
+        byte[] cipherText = null;
+        try {
+          // get an RSA cipher object and print the provider
+          final Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+          // encrypt the plain text using the public key
+          cipher.init(Cipher.ENCRYPT_MODE, key);
+          cipherText = cipher.doFinal(datos);
+        } catch (Exception e) {
+          e.printStackTrace();
+          System.exit(0);
+        }
+        return cipherText;
     }
 
-    return new String(dectyptedText);
-  }
+    public String decrypt(byte[] datos, Key key) {
+        byte[] dectyptedText = null;
+        try {
+          // get an RSA cipher object and print the provider
+          final Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+
+          // decrypt the text using the private key
+          cipher.init(Cipher.DECRYPT_MODE, key);
+          dectyptedText = cipher.doFinal(datos);
+
+        } catch (Exception ex) {
+          ex.printStackTrace();
+          System.exit(0);
+        }
+
+        return new String(dectyptedText);
+    }
+  
+  public void guardarLlave(String path, Key llave) throws IOException {
+
+            FileOutputStream fos = new FileOutputStream(path);
+            fos.write(llave.getEncoded());
+            fos.close();
+    }
 }
