@@ -1,8 +1,5 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
-http://www.java2s.com/Tutorial/Java/0490__Security/CreatingaCertificateinJava.htm
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ Para la generacion del certificado ver la clase JavaApplication1
  */
 package certificado;
      
