@@ -17,18 +17,20 @@ public class JavaApplication1 {
         CifradorRSA cifrador = new CifradorRSA();
         KeyPair llavesCliente = cifrador.generarLlaves(2048);
         Certificado cer;
-        
-        cer = new Certificado("1010", "Alan Hernandez Robles", "10/02/1990", llavesCliente.getPublic(), "Banxico");
+        /********* Generar certificado **********/
+        /*
+        cer = new Certificado("1010", "Alan Hernandez Robles", "10/02/1990", llavesCliente.getPublic(), "Banxico", "01/01/2020");
         PrivateKey llavePrivadaBanco = (PrivateKey) cifrador.leerLlave("llaves/private.key", CifradorRSA.TipoLlave.PRIVADA);
         cer.firmar(llavePrivadaBanco);
         cifrador.guardarLlave("certificados/" + cer.getId() + ".key", llavesCliente.getPrivate(), CifradorRSA.TipoLlave.PRIVADA);
         System.out.println("Certificado generado");
         System.out.println(cer);
-        
-        
+        */
+        /********* Leer y validar certificado ********/
         PublicKey llavePublicaBanco = (PublicKey) cifrador.leerLlave("llaves/public.key", CifradorRSA.TipoLlave.PUBLICA);
         cer = new Certificado();
-        cer.leerCertificado("certificados/1010.cer", llavePublicaBanco);
+        boolean valido = cer.leerCertificado("certificados/1010.cer", llavePublicaBanco);
+        System.out.println("Certificado " + (valido ? "valido" : "invalido"));
         System.out.println("Certificado leido: ");
         System.out.println(cer);
     }
