@@ -88,10 +88,7 @@ public class Certificado {
         } catch (NoSuchAlgorithmException | IOException ex) {
             ex.printStackTrace();
         }
-    }
-    public String getId(){
-        return this.id;
-    }
+    }   
     
     public boolean leerCertificado(String path, PublicKey llave){
         try{
@@ -157,5 +154,24 @@ public class Certificado {
             arregloByte[i++] = b;
         }
         return arregloByte;
+    }
+    
+    public String getId(){
+        return this.id;
+    }
+    public String getNombre(){
+        return this.nombre;
+    }
+    public String getFechaDeNacimiento(){
+        return this.fechaDeNacimiento;
+    }
+    public String getCertificador(){
+        return this.certificador;
+    }
+    public String getVigencia(){
+        return this.vigencia;
+    }
+    public PublicKey getLlave(){
+        return this.llave;
     }
 }
