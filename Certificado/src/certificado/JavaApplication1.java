@@ -7,15 +7,29 @@ package certificado;
 
 import java.security.KeyPair;
 import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.Arrays;
+import java.util.Collections;
 
 public class JavaApplication1 {
-  public static void main(String[] args) {
-      CifradorRSA cifrador = new CifradorRSA();
-      KeyPair llavesCliente = cifrador.generarLlaves(2048);
-      Certificado cer = new Certificado("1010", "Alan Hernandez Robles", "10/02/1990", llavesCliente.getPublic(), "Banxico");
-      PrivateKey llavePrivadaBanco = (PrivateKey) cifrador.leerLlave("llaves/private.key", CifradorRSA.TipoLlave.PRIVADA);
-      cer.firmar(llavePrivadaBanco);
-      cifrador.guardarLlave("certificados/" + cer.getId() + ".key", llavesCliente.getPrivate(), CifradorRSA.TipoLlave.PRIVADA);
-      System.out.println("Certificado generado");
-  }
+    
+    public static void main(String[] args) {
+        CifradorRSA cifrador = new CifradorRSA();
+        KeyPair llavesCliente = cifrador.generarLlaves(2048);
+        Certificado cer;
+        
+        cer = new Certificado("1010", "Alan Hernandez Robles", "10/02/1990", llavesCliente.getPublic(), "Banxico");
+        PrivateKey llavePrivadaBanco = (PrivateKey) cifrador.leerLlave("llaves/private.key", CifradorRSA.TipoLlave.PRIVADA);
+        cer.firmar(llavePrivadaBanco);
+        cifrador.guardarLlave("certificados/" + cer.getId() + ".key", llavesCliente.getPrivate(), CifradorRSA.TipoLlave.PRIVADA);
+        System.out.println("Certificado generado");
+        System.out.println(cer);
+        
+        
+        PublicKey llavePublicaBanco = (PublicKey) cifrador.leerLlave("llaves/public.key", CifradorRSA.TipoLlave.PUBLICA);
+        cer = new Certificado();
+        cer.leerCertificado("certificados/1010.cer", llavePublicaBanco);
+        System.out.println("Certificado leido: ");
+        System.out.println(cer);
+    }
 }
