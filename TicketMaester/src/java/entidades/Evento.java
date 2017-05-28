@@ -17,6 +17,7 @@ public class Evento {
     private Date fecha;
     private byte[] foto;
     private String lugar;
+    private String desc;
     
     public Evento() {
         
@@ -33,6 +34,17 @@ public class Evento {
         this.lugar = lugar;
     }
 
+    public Evento( String nombre, String tipo, double precio, int asientos, Date fecha, byte[] foto, String lugar, String desc ) {
+        this.nombre = nombre;
+        this.tipo = tipo;
+        this.precio = precio;
+        this.asientos = asientos;
+        this.fecha = fecha;
+        this.foto = foto;
+        this.lugar = lugar;
+        this.desc = desc;
+    }
+    
     public Evento(int id, String nombre, String tipo, double precio, int asientos, Date fecha) {
         this.id = id;
         this.nombre = nombre;
@@ -105,4 +117,13 @@ public class Evento {
     public void setLugar(String lugar) {
         this.lugar = lugar;
     }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+    
 }

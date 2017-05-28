@@ -1,37 +1,94 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controlador;
 
+import entidades.Evento;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Paths;
+import java.util.Base64;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
+import negocio.ConexionMySQL;
+import negocio.DAO;
+import negocio.PropiedadConexion;
 
 /**
  *
  * @author isaac_stark
  */
+@WebServlet("/Registro")
+@MultipartConfig
 public class RegistroTicket extends HttpServlet {
-
+    private static final long serialVersionUID = 1L;
+    private PropiedadConexion connProp;
+    private ConexionMySQL conexionBD;
+    private DAO consulta;
+    
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        String ruta = config.getServletContext().getRealPath("/conf/config.properties");
+        System.out.println("la ruta es: " + ruta);
+        connProp = new PropiedadConexion(ruta); // poner ruta
+        conexionBD = new ConexionMySQL( connProp );
+        conexionBD.getConexion();
+        consulta = new DAO( conexionBD.getConn() );
+    }
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        //response.setContentType("text/html;charset=UTF-8");
-        String username = request.getParameter("nameUser");
-        String pass = request.getParameter("pass");
-        
-        System.out.println("USERNAME_REGISTRO " + username + "  " + pass );
-        
-        if( username != null && pass != null ) {
-            response.sendRedirect("registro.html");
-        } else {
-            response.sendRedirect("prueba.html");
+
+        String name = request.getParameter("name");
+        String tipo = request.getParameter("tipo");
+        String precio = request.getParameter("precio");
+        String asientos = request.getParameter("asientos");
+        String fecha = request.getParameter("fecha");
+        Part foto = request.getPart("foto");
+        String lugar = request.getParameter("lugar");
+        String desc = request.getParameter("desc");
+
+        System.out.println( name );
+        System.out.println( tipo );
+        System.out.println( precio );
+        System.out.println( asientos );
+        System.out.println( fecha );
+
+        byte contenidoFoto[] = null;
+        String img = "data:image/jpeg;base64,";
+
+        if( foto != null ) {
+            String nameFoto = Paths.get( foto.getSubmittedFileName() ).getFileName().toString();
+
+            InputStream fileContent = foto.getInputStream();
+
+            contenidoFoto = new byte[ fileContent.available() ];
+            fileContent.read( contenidoFoto, 0, fileContent.available() );
+            img += Base64.getEncoder().encodeToString( contenidoFoto );
+
+            fileContent.close();
+            System.out.println(nameFoto + "  " + contenidoFoto.length);
+            contenidoFoto = img.getBytes();
         }
+
+        System.out.println( lugar );
+        System.out.println( desc );
+
+        Calendar f = new GregorianCalendar();
+        String fec[] = fecha.split("-");
+        f.set( Integer.parseInt( fec[0] ), Integer.parseInt( fec[1] ) - 1, Integer.parseInt( fec[2] ) );
+
+        Evento ev = new Evento(name, tipo, Double.parseDouble( precio ), Integer.parseInt( asientos ), f.getTime(), contenidoFoto, lugar, desc);
+        consulta.insertar( ev, fecha );
         
+        response.setContentType("text/html;charset=UTF-8");
+        response.getWriter().print("<h1>Hola</h1>");
+        response.getWriter().print("<img src='" + img + "'/>");
     }
 
     @Override

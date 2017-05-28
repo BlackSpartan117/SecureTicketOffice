@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Date;
 import java.util.LinkedList;
 
 public class DAO {
@@ -18,26 +19,28 @@ public class DAO {
         this.conn = conn;
     }
 
-    public void insertar(String tipo, String lugar, String ruta, String rutaAlterna, String fecha, String id) {
-        String query = "INSERT INTO evento VALUES( '"
-                + tipo + "',  '" + lugar + "', '" + ruta + "', '" + rutaAlterna + "', '" + fecha + "', '" + id + "' )";
+    public void insertar( Evento e, String fec ) {
+        String query = "INSERT INTO evento( nombre, tipo, precio, asientos, fecha, foto, lugar, descripcion )"
+                + "VALUES( '" + e.getNombre() + "', '" + e.getTipo() + "', " + e.getPrecio() + ", " 
+                + e.getAsientos() + ", '" + fec + "', '" + new String( e.getFoto() ) + "', '" 
+                + e.getLugar() + "', '" + e.getDesc() + "' )";
 
         try {
             if (this.conn == null) {
                 System.out.println("La conexion es nula");
             } else {
                 sentenciaSQL = this.conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                System.out.println("Consulta: " + query);
+                System.out.println("Consulta: " );
                 sentenciaSQL.executeUpdate(query);
                 System.out.println("Registro Finalizo con exito!!");
             }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException sqlE) {
+            sqlE.printStackTrace();
         }
     }
-
-    public void actualizarFigura(String figura, String id) {
+    
+    public void actualizarEvento( Evento ev ) {
         String query = "UPDATE evento set nombre = null";
         PreparedStatement stmt;
 
@@ -51,7 +54,7 @@ public class DAO {
 
     }
 
-    public void eliminar(String id) {
+    public void eliminarEvento( Evento ev ) {
         String query = "DELETE FROM evento";
 
         try {

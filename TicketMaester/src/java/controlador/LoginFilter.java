@@ -39,7 +39,7 @@ public class LoginFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         this.filterConfig = filterConfig;
-        ruta = filterConfig.getServletContext().getRealPath("/conf/user.txt");
+        this.ruta = filterConfig.getServletContext().getRealPath( filterConfig.getInitParameter( "UsuarioPermitido" ) );
         System.out.println("ruta " + ruta );
         // leer la lista de usuario revocados
         revokeList = new java.util.ArrayList();
@@ -82,10 +82,12 @@ public class LoginFilter implements Filter {
         
         // si el usuario está en la lista de revocados, enviar error
         if( revokeList.contains( username ) ) {
-            res.sendError( javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED );
+            System.out.println("NO SECONTIENE NADA");
+            res.sendRedirect("registro.html");
             return;
-        }
-
+        } 
+        
+        res.sendError( javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED );
         // llamar al siguiente filtro de la cadena: permitir que j_security_check autentique al 
         // usuario
         chain.doFilter( request, response );
@@ -103,12 +105,13 @@ public class LoginFilter implements Filter {
             // obtener el archivo de la lista de usuarios revocados y abrirlo.
             BufferedReader in;
             try {
-                String filename = filterConfig.getInitParameter( ruta );
+                String filename = filterConfig.getInitParameter( this.ruta ); 
                 in = new BufferedReader( new FileReader( filename ) );
+                
             } catch( FileNotFoundException fnfe ) { 
                 fnfe.printStackTrace();
                 return;
-            } 
+            }
 
             // leer todos los usuarios revocados y añadirlos a revokeList. 
             String userName;
