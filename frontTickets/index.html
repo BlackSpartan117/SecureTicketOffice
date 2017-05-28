@@ -19,13 +19,12 @@
     
     <!-- Font awesome -->
     <link href="css/font-awesome-4.6.3/css/font-awesome.min.css" rel="stylesheet">
-
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
+    
+    <!-- Estilos de lobibox (notificaciones) -->
+    <link rel="stylesheet" type="text/css" href="plugins/lobibox/css/lobibox.min.css">
+    
+    <!-- Estilos del form validator-->
+    <link rel="stylesheet" type="text/css" href="plugins/form-validator/theme-default.min.css">
 
 </head>
 
@@ -62,9 +61,9 @@
             <div class="col-md-3">
                 <p class="lead">Boletos</p>
                 <div class="list-group">
-                    <a href="#" class="list-group-item">Cine</a>
-                    <a href="#" class="list-group-item">Teatro</a>
-                    <a href="#" class="list-group-item">Conciertos</a>
+                    <button href="#" class="list-group-item icono" data-evento="C">Cine</button>
+                    <button href="#" class="list-group-item icono" data-evento="T">Teatro</button>
+                    <button href="#" class="list-group-item icono" data-evento="M">Conciertos</button>
                 </div>
             </div>
 
@@ -72,7 +71,7 @@
 
                 <div class="carousel-holder">
 
-                    <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+                    <div id="carousel-eventos" class="carousel slide" data-ride="carousel">
                       <div class="carousel-inner" role="listbox">
                         <div class="carousel-item active">
                           <img class="d-block img-fluid" src="img/coldplay.jpg" alt="First slide">
@@ -96,7 +95,7 @@
 
                 </div>
 
-                <div class="row">
+                <div class="row" id="lista-eventos">
 
                     <div class="col-sm-4 col-lg-4 col-md-4">
                         <div class="thumbnail">
@@ -123,7 +122,7 @@
                                     <i class="fa fa-star-o" aria-hidden="true"></i>
                                 </p>
                             </div>
-                            <center><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong">Comprar</button></center>
+                            <center><button type="button" class="btn btn-primary boton-comprar" data-toggle="modal" data-evento="evento1" disabled >Agotado</button></center>
                         </div>
                     </div>
 
@@ -152,7 +151,7 @@
                                     <i class="fa fa-star-o" aria-hidden="true"></i>
                                 </p>
                             </div>
-                            <center><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong">Comprar</button></center>
+                            <center><button type="button" class="btn btn-primary boton-comprar" data-toggle="modal" data-evento="evento2">Comprar</button></center>
                         </div>
                     </div>
 
@@ -181,7 +180,7 @@
                                     <i class="fa fa-star-o" aria-hidden="true"></i>
                                 </p>
                             </div>
-                            <center><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong">Comprar</button></center>
+                            <center><button type="button" class="btn btn-primary boton-comprar" data-toggle="modal" data-evento="evento3">Comprar</button></center>
                         </div>
                     </div>
 
@@ -210,7 +209,7 @@
                                     <i class="fa fa-star-o" aria-hidden="true"></i>
                                 </p>
                             </div>
-                            <center><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong">Comprar</button></center>
+                            <center><button type="button" class="btn btn-primary boton-comprar" data-toggle="modal" data-evento="evento4">Comprar</button></center>
                         </div>
                     </div>
 
@@ -239,7 +238,7 @@
                                     <i class="fa fa-star-o" aria-hidden="true"></i>
                                 </p>
                             </div>
-                            <center><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong">Comprar</button></center>
+                            <center><button type="button" class="btn btn-primary boton-comprar" data-toggle="modal" data-evento="evento5">Comprar</button></center>
                         </div>
                     </div>
 
@@ -257,8 +256,9 @@
           <span class="text-muted">Copyright <i class="fa fa-copyright" aria-hidden="true"> Secure ticket system.</i></span>
       </div>
     </footer>
+    
     <!-- Modal comprar -->
-    <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal fade" id="modal-comprar" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true" data-evento="">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -267,38 +267,86 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
+          <form id="formulario-pago">
           <div class="modal-body">
-            <div id="tab1" class="tab-grid">
-                <img src="img/payment.png" alt="payment">
-                <br><br>
-                <input type="text" class="payment" value="N&uacute;mero de tarjeta" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'N&uacute;mero de tarjeta';}">
-                <input type="text" class="payment" value="Nombre del titular" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Nombre del titular';}">
-                <p>Vigencia:<select class="month">
-                                            <option value="">Mes</option>
-                                            <option value="01">Jan</option>
-                                            <option value="02">Feb</option>
-                                            <option value="03">Mar</option>
-                                            <option value="04">Apr</option>
-                                            <option value="05">May</option>
-                                            <option value="06">Jun</option>
-                                            <option value="07">Jul</option>
-                                            <option value="08">Aug</option>
-                                            <option value="09">Sep</option>
-                                            <option value="10">Oct</option>
-                                            <option value="11">Nov</option>
-                                            <option value="12">Dec</option>
-                                        </select>
-                                        <select class="year">
-                                            <option value="">A&ntilde;o</option>
-                                            <option value="2015">2015</option><option value="2016">2016</option><option value="2017">2017</option><option value="2018">2018</option><option value="2019">2019</option><option value="2020">2020</option><option value="2021">2021</option><option value="2022">2022</option><option value="2023">2023</option><option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option><option value="2031">2031</option><option value="2032">2032</option><option value="2033">2033</option><option value="2034">2034</option><option value="2035">2035</option><option value="2036">2036</option><option value="2037">2037</option><option value="2038">2038</option><option value="2039">2039</option><option value="2040">2040</option><option value="2041">2041</option><option value="2042">2042</option><option value="2043">2043</option><option value="2044">2044</option><option value="2045">2045</option><option value="2046">2046</option><option value="2047">2047</option><option value="2048">2048</option><option value="2049">2049</option><option value="2050">2050</option><option value="2051">2051</option><option value="2052">2052</option><option value="2053">2053</option><option value="2054">2054</option><option value="2055">2055</option><option value="2056">2056</option><option value="2057">2057</option><option value="2058">2058</option><option value="2059">2059</option><option value="2060">2060</option><option value="2061">2061</option><option value="2062">2062</option><option value="2063">2063</option><option value="2064">2064</option><option value="2065">2065</option><option value="2066">2066</option><option value="2067">2067</option><option value="2068">2068</option><option value="2069">2069</option><option value="2070">2070</option><option value="2071">2071</option><option value="2072">2072</option><option value="2073">2073</option><option value="2074">2074</option></select>
-                                            <input type="text" class="cvv" value="cvv" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'cvv';}">
-                                            </p>
-            </div>
+              <div class="form-group">
+                  <img src="img/payment.png" alt="payment">
+              </div>
+                <div class="form-group">
+                    <label for="numero-tarjeta">N&uacute;mero de tarjeta: <span class="req" data-toggle="tooltip" data-placement="right" data-animation="false" title="Este campo es obligatorio">*</span></label>
+                    <input type="text" 
+                        class="form-control" 
+                        id="numero-tarjeta" 
+                        name="numero-tarjeta"
+                        data-validation="required custom"
+                        data-validation-regexp="^[0-9]{16}$"
+                        data-validation-error-msg-custom="Ingresa los 16 n&uacute;meros de la tarjeta"
+                        data-validation-error-msg-required="Este campo es obligatorio">
+                </div>
+                <div class="form-group">
+                  <label for="titular-tarjeta">Nombre del titular: <span class="req" data-toggle="tooltip" data-placement="right" data-animation="false" title="Este campo es obligatorio">*</span></label>
+                  <input type="text" 
+                     class="form-control" 
+                     id="titular-tarjeta" 
+                     name="titular-tarjeta"
+                     data-validation="required custom"
+                     data-validation-regexp="^[a-zA-ZñÑáéíóúÁÉÍÓÚ][a-zA-ZñÑáéíóúÁÉÍÓÚ ]*$"
+                     data-validation-error-msg-custom="Ingresa el nombre del titular de la tarjeta"
+                     data-validation-error-msg-required="Este campo es obligatorio">
+                </div>
+                <div class="form-group row">
+                  <div class="col-sm-3" style="padding-right: 0;">
+                      <label>Vigencia: </label>
+                  </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-2">
+                      <label for="vigencia-mes">Mes: <span class="req" data-toggle="tooltip" data-placement="right" data-animation="false" title="Este campo es obligatorio">*</span></label>
+                    </div>
+                    <div class="col-sm-4">
+                      <select class="form-control custom-select" id="vigencia-mes" name="vigencia-mes">
+                        <option value="01">Enero</option>
+                        <option value="02">Febrero</option>
+                        <option value="03">Marzo</option>
+                        <option value="04">Abril</option>
+                        <option value="05">Mayo</option>
+                        <option value="06">Junio</option>
+                        <option value="07">Julio</option>
+                        <option value="08">Agosto</option>
+                        <option value="09">Septiembre</option>
+                        <option value="10">Octubre</option>
+                        <option value="11">Noviembre</option>
+                        <option value="12">Diciembre</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-2">
+                     <label for="vigencia-anio">A&ntilde;o: <span class="req" data-toggle="tooltip" data-placement="right" data-animation="false" title="Este campo es obligatorio">*</span></label>
+                    </div>
+                    <div class="col-sm-4">
+                      <select class="form-control custom-select" id="vigencia-anio" name="vigencia-anio">
+                        <option value="2017">2017</option><option value="2018">2018</option><option value="2019">2019</option><option value="2020">2020</option><option value="2021">2021</option><option value="2022">2022</option><option value="2023">2023</option><option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option><option value="2031">2031</option><option value="2032">2032</option><option value="2033">2033</option><option value="2034">2034</option><option value="2035">2035</option><option value="2036">2036</option><option value="2037">2037</option><option value="2038">2038</option><option value="2039">2039</option><option value="2040">2040</option><option value="2041">2041</option><option value="2042">2042</option><option value="2043">2043</option><option value="2044">2044</option><option value="2045">2045</option><option value="2046">2046</option><option value="2047">2047</option><option value="2048">2048</option><option value="2049">2049</option><option value="2050">2050</option><option value="2051">2051</option><option value="2052">2052</option><option value="2053">2053</option><option value="2054">2054</option><option value="2055">2055</option><option value="2056">2056</option><option value="2057">2057</option><option value="2058">2058</option><option value="2059">2059</option><option value="2060">2060</option><option value="2061">2061</option><option value="2062">2062</option><option value="2063">2063</option><option value="2064">2064</option><option value="2065">2065</option><option value="2066">2066</option><option value="2067">2067</option><option value="2068">2068</option><option value="2069">2069</option><option value="2070">2070</option><option value="2071">2071</option><option value="2072">2072</option><option value="2073">2073</option><option value="2074">2074</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group container" style="padding-left: 0;">
+                    <div class="col-sm-6" style="padding-left: 0;">
+                        <label for="cvv-tarjeta">cvv/cvc: <span class="req" data-toggle="tooltip" data-placement="right" data-animation="false" title="Este campo es obligatorio">*</span></label>
+                      <input type="text" 
+                         class="form-control" 
+                         id="cvv-tarjeta" 
+                         name="cvv-tarjeta"
+                         data-validation="required custom"
+                         data-validation-regexp="^[0-9]{3,4}$"
+                         data-validation-error-msg-custom="Ingresa los tres o cuatro n&uacute;meros ubicados en el reverso de tu tarjeta"
+                         data-validation-error-msg-required="Este campo es obligatorio">
+                    </div>
+                </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-            <button type="button" class="btn btn-primary">Realizar el pago</button>
+            <button type="submit" class="btn btn-primary">Realizar el pago</button>
           </div>
+          </form>
         </div>
       </div>
     </div>
@@ -306,8 +354,18 @@
     <!-- jQuery -->
     <script src="js/jquery-3.2.0.min.js"></script>
 
+    <!-- Tether -->
+    <script src="js/tether.min.js"></script>
+    
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.min.js"></script>
+    
+    <!-- Exponenciacion modular -->
+    <script src="js/fme.js"></script>
+    
+    <script type="text/javascript" src="plugins/lobibox/js/lobibox.min.js"></script>
+    <script type="text/javascript" src="plugins/form-validator/jquery.form-validator.min.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
 
 </body>
 
