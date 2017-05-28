@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Ticket Maester</title>
+        
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/shop-homepage.css" rel="stylesheet">
+        <link href="css/font-awesome-4.6.3/css/font-awesome.min.css" rel="stylesheet">
+        <link href="fonts/glyphicons-halflings-regular.svg" rel="stylesheet">
+    </head>
+    <body>
+        <!-- Navigation -->
+        <nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse fixed-top">
+            <div class="container">
+                <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <a class="navbar-brand" href="#">
+                    <i class="fa fa-ticket" aria-hidden="true"> Ticket Escom</i>
+                </a>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="#">Acerca de <span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Contacto</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <!-- Page Content -->
+        <div class="container">
+
+            <div class="row">
+                <div class="col-sm-2">&nbsp;</div>
+                
+                <div class="col-sm-8">
+                    
+                    <div class="carousel-holder">
+
+                        <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+                            <div class="carousel-inner" role="listbox">
+                                <div class="carousel-item active">
+                                    <img class="d-block img-fluid" src="img/coldplay.jpg" alt="First slide">
+                                </div>
+                                <div class="carousel-item">
+                                    <img class="d-block img-fluid" src="img/hobbit.jpg" alt="Second slide">
+                                </div>
+                                <div class="carousel-item">
+                                    <img class="d-block img-fluid" src="img/teatro.jpg" alt="Third slide">
+                                </div>
+                            </div>
+
+                            <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                            <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="sr-only">Next</span>
+                            </a>
+                        </div>
+
+                    </div>
+                    
+                    <div class="form-control">
+                        <form class="form-group" enctype="multipart/form-data" method="post" action="Registro">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <label class="control-label" for="name">Nombre: </label>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <input type="text" id="name" name="name" class="form-control" placeholder="Titulo del evento"/>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <label class="control-label" for="tipo">Tipo: </label>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <select id="tipo" name="tipo">
+                                            <option selected>Cine</option>
+                                            <option>Teatro</option>
+                                            <option>Concierto</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <label class="control-label" for="precio">Precio: </label>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <input type="text" id="precio" name="precio" class="form-control" placeholder="99.00"/>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <label class="control-label" for="asientos">No. de asientos: </label>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <input type="number" value="10" min="10" max="100" name="asientos" id="asientos" class="form-control"/>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <label class="control-label" for="fecha">Fecha: </label>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <input type="text" id="fecha" name="fecha" class="form-control" placeholder="yyyy-mm-dd"/>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <label class="control-label" for="foto">Cartel: </label>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <input type="file" id="foto" name="foto" class="form-control"/>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <label class="control-label" for="lugar">Lugar: </label>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <input type="text" id="lugar" name="lugar" class="form-control" placeholder="Av. algo "/>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <label class="control-label" for="desc">Descripci&oacute;n: </label>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <textarea id="desc" name="desc" class="form-control"></textarea>
+                                    </div>
+                                </div>
+                            </div>    
+                            
+                            <div class="row">
+                                <div class="col-sm-2">&nbsp;</div>
+                                <div class="input-group-btn col-sm-8">
+                                    <input type="submit" class="btn btn-primary" value="Enviar"/>
+                                    <input type="reset" class="btn btn-secondary" />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="col-sm-2">&nbsp;</div>
+            </div>
+            <div class="row">&nbsp;</div>
+        </div>
+        <!-- /.container -->
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <span class="text-muted">Copyright <i class="fa fa-copyright" aria-hidden="true"> Secure ticket system.</i></span>
+            </div>
+        </footer>
+
+        <script src="js/jquery.min.js"></script>
+        <script src="js/jquery-3.2.0.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+    </body>
+</html>
