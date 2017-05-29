@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import negocio.ConexionMySQL;
 import negocio.DAO;
 import negocio.PropiedadConexion;
+import xml.ConectarServidor;
+import xml.WriteXML;
 
 /**
  *
@@ -45,6 +47,9 @@ public class Ticket extends HttpServlet {
         
         request.setCharacterEncoding("UTF-8");
         if( opcion != null && opcion.equals("iniciaPagina") ) {
+            WriteXML xml = new WriteXML();
+            ConectarServidor cs = new ConectarServidor();
+            cs.conectar();
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             iniciarPagina( request, response );
