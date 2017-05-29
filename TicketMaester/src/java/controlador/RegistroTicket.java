@@ -86,6 +86,8 @@ public class RegistroTicket extends HttpServlet {
         Evento ev = new Evento(name, tipo, Double.parseDouble( precio ), Integer.parseInt( asientos ), f.getTime(), contenidoFoto, lugar, desc);
         consulta.insertar( ev, fecha );
         
+        
+        
         response.setContentType("text/html;charset=UTF-8");
         response.getWriter().print("<h1>Hola</h1>");
         response.getWriter().print("<img src='" + img + "'/>");
