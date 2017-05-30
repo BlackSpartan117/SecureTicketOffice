@@ -13,6 +13,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.security.AlgorithmParameterGenerator;
 import java.security.AlgorithmParameters;
+import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidParameterSpecException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -72,7 +73,7 @@ public class Ticket extends HttpServlet {
             
         } 
         else if (accion != null && accion.equals("parametros")){
-             
+             DiffieHellman(request,response);
         }else {
             response.getWriter().print("Error");
         }
@@ -101,9 +102,10 @@ public class Ticket extends HttpServlet {
     JsonObject o = respuesta.build();
     
     PrintWriter out = response.getWriter();
+    System.out.println(o);
     out.print(o);
     
-        } catch (InvalidParameterSpecException |IOException ex) {
+        } catch (InvalidParameterSpecException | IOException | NoSuchAlgorithmException ex) {
             
         }
 
