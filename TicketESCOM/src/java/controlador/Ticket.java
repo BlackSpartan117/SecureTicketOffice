@@ -81,7 +81,7 @@ public class Ticket extends HttpServlet {
     }
     
     
-    private void DiffieHellman(HttpServletRequest reques,HttpServletResponse response) throws NoSuchAlgorithmException{
+    private void DiffieHellman(HttpServletRequest reques,HttpServletResponse response){
      
           
         try {
