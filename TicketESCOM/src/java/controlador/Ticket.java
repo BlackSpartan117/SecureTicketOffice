@@ -13,6 +13,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.security.AlgorithmParameterGenerator;
 import java.security.AlgorithmParameters;
+import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidParameterSpecException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -79,7 +80,7 @@ public class Ticket extends HttpServlet {
     }
     
     
-    private void DiffieHellman(HttpServletRequest reques,HttpServletResponse response){
+    private void DiffieHellman(HttpServletRequest reques,HttpServletResponse response) throws NoSuchAlgorithmException{
      
           
         try {
