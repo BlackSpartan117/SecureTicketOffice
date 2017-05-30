@@ -88,8 +88,8 @@ $.validate({
 function consultarEventos(evento){
     $.ajax({
         'type': 'POST',
-        'url': 'ControladorConsultarEventos',
-        'data': {'tipo': evento},
+        'url': 'Ticket',
+        'data': {'iniciar': 'iniciaPagina', 'tipo': evento},
         success: function(resp){
             var listaEventos = $.parseJSON(resp);
             var htmlEventos = '';
@@ -152,4 +152,5 @@ function handShake(){
         }
     });
 }
-handShake();
+//handShake();
+consultarEventos('C');

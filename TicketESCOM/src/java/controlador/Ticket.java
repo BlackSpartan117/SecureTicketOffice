@@ -65,11 +65,12 @@ public class Ticket extends HttpServlet {
         
         request.setCharacterEncoding("UTF-8");
         if( opcion != null && opcion.equals("iniciaPagina") ) {
-            response.setContentType("application/json");
+            System.out.println("\n\n\n\nOK\n\n\n");
+            //response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             System.out.println("CONECTAR BANCO\n");
-            conectarConBanco( request, response );
-            //iniciarPagina( request, response );
+            //conectarConBanco( request, response );
+            iniciarPagina( request, response );
             
         } 
         else if (accion != null && accion.equals("parametros")){
@@ -192,9 +193,15 @@ public class Ticket extends HttpServlet {
     
     private void iniciarPagina( HttpServletRequest request, HttpServletResponse response ) {
         LinkedList<Evento> eventos;
-        
+        String tipo = request.getParameter("tipo");
+        String tipoEvento = "";
+        switch(tipo){
+            case "C": tipoEvento = "Cine"; break;
+            case "T": tipoEvento = "Teatro"; break;
+            case "M": tipoEvento = "Concierto"; break;
+        }
         try {
-            eventos = consulta.obtenerEventos();
+            eventos = consulta.obtenerEventos(tipoEvento);
             
             if( eventos != null ) {
                 System.out.println("SIZE event " + eventos.size() );
@@ -215,12 +222,13 @@ public class Ticket extends HttpServlet {
         eventos.forEach((e) -> {
             values.add(Json.createObjectBuilder()
                     .add("Id", Integer.toString( e.getId() ) )
-                    .add("Nombre", e.getNombre() )
+                    .add("titulo", e.getNombre() )
                     .add("Tipo", e.getTipo() )
-                    .add("Precio", Double.toString( e.getPrecio() ) )
-                    .add("Asientos", Integer.toString( e.getAsientos() ) )
-                    .add("Fecha", e.getFecha().toString() )
-                    .add("Foto", new String( e.getFoto() ) )
+                    .add("precio", Double.toString( e.getPrecio() ) )
+                    .add("lugares", Integer.toString( e.getAsientos() ) )
+                    //.add("Fecha", e.getFecha().toString() )
+                    .add("descripcion", e.getFecha().toString() )
+                    .add("imagen", new String( e.getFoto() ) )
                     .add("Lugar", e.getLugar() ) );
         });
 

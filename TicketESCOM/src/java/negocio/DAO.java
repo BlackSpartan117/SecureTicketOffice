@@ -70,8 +70,8 @@ public class DAO {
         }
     }
 
-    public LinkedList<Evento> obtenerEventos() throws IOException {
-        String query = "SELECT * FROM evento";
+    public LinkedList<Evento> obtenerEventos(String evento) throws IOException {
+        String query = "SELECT * FROM evento WHERE tipo='" + evento + "'";
         Evento evs;
         LinkedList<Evento> eventos = new LinkedList();
         
