@@ -4,18 +4,27 @@ import entidades.Evento;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.security.AlgorithmParameterGenerator;
+import java.security.AlgorithmParameters;
+import java.security.spec.InvalidParameterSpecException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.crypto.spec.DHParameterSpec;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -50,6 +59,7 @@ public class Ticket extends HttpServlet {
             throws ServletException, IOException {
         
         String opcion = request.getParameter("iniciar");
+        String accion = request.getParameter("accion");
         System.out.println( "OPCION  " + opcion );
         
         request.setCharacterEncoding("UTF-8");
@@ -60,11 +70,46 @@ public class Ticket extends HttpServlet {
             conectarConBanco( request, response );
             //iniciarPagina( request, response );
             
-        } else {
+        } 
+        else if (accion != null && accion.equals("parametros")){
+             
+        }else {
             response.getWriter().print("Error");
         }
     }
     
+    
+    private void DiffieHellman(HttpServletRequest reques,HttpServletResponse response){
+     
+          
+        try {
+            AlgorithmParameterGenerator paramGen = AlgorithmParameterGenerator.getInstance("DH");
+    paramGen.init(1024);
+
+    AlgorithmParameters params = paramGen.generateParameters();
+    DHParameterSpec dhSpec;
+    dhSpec = (DHParameterSpec) params.getParameterSpec(DHParameterSpec.class);
+            
+    System.out.println("" + dhSpec.getP() + "\n" + dhSpec.getG() + "\n" + dhSpec.getL());
+    
+    JsonObjectBuilder respuesta = Json.createObjectBuilder();
+    
+    respuesta.add("primo", dhSpec.getP());
+    respuesta.add("generador",dhSpec.getG());
+    respuesta.add("longitud",dhSpec.getL());
+    
+    JsonObject o = respuesta.build();
+    
+    PrintWriter out = response.getWriter();
+    out.print(o);
+    
+        } catch (InvalidParameterSpecException |IOException ex) {
+            
+        }
+
+   
+    
+    }
     /* Ejemplo extraido de http://www.theserverside.com/news/thread.tss?thread_id=21884
     ** http://programacionextrema.com/2015/11/26/realizar-una-peticion-post-en-java/*/
     private void conectarConBanco( HttpServletRequest request, HttpServletResponse response ) {
