@@ -1,5 +1,6 @@
-package com.bank.controlador;
+package com.bankescomaester.controlador;
 
+import com.bankescomaester.xml.WriteXML;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author isaac_stark
  */
+
 public class Cuenta extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -41,9 +43,14 @@ public class Cuenta extends HttpServlet {
         out.println("<html>");
         out.println("<head><title>Un servlet básico</title></head>");
         out.println("<body>");
-        out.println("<h1>Esto es una prueba de un servlet con GET</h1>");
+        out.println("<h1>Este es el servlet de BankESCOMaester</h1>");
         out.println("<h1>La suma de " + x + " + " + y + " = " + resultado + " </h1>");
         out.println("</body></html>");
+        
+        String xml = new WriteXML().crearXML();
+        response.setContentType("text/xml");
+        response.getWriter().println( xml );
+                
         out.close();
         
     }
