@@ -82,3 +82,13 @@ body > .container {
   padding-right: 15px;
   padding-left: 15px;
 }
+
+.icono {
+    cursor: pointer;
+}
+
+.icono:hover{
+    background-color: #5bc0de;
+    color: white;
+}
+

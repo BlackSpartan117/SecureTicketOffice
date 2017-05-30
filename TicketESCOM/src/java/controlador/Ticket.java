@@ -73,7 +73,7 @@ public class Ticket extends HttpServlet {
             
         } 
         else if (accion != null && accion.equals("parametros")){
-             
+             DiffieHellman(request,response);
         }else {
             response.getWriter().print("Error");
         }
@@ -102,9 +102,10 @@ public class Ticket extends HttpServlet {
     JsonObject o = respuesta.build();
     
     PrintWriter out = response.getWriter();
+    System.out.println(o);
     out.print(o);
     
-        } catch (InvalidParameterSpecException |IOException ex) {
+        } catch (InvalidParameterSpecException | IOException | NoSuchAlgorithmException ex) {
             
         }
 
