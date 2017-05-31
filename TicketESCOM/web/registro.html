@@ -10,6 +10,10 @@
         <link href="css/font-awesome-4.6.3/css/font-awesome.min.css" rel="stylesheet">
         <link href="fonts/glyphicons-halflings-regular.svg" rel="stylesheet">
         <link href="css/estiloRegistroTickets.css" rel="stylesheet">
+        
+        <link rel="stylesheet" type="text/css" href="plugins/lobibox/css/lobibox.min.css">
+        <!-- Estilos del form validator-->
+        <link rel="stylesheet" type="text/css" href="plugins/form-validator/theme-default.min.css">
     </head>
     <body>
         <!-- Navigation -->
@@ -69,14 +73,22 @@
                     </div>
                     
                     <div class="form-control">
-                        <form class="form-group" enctype="multipart/form-data" method="post" action="Registro">
+                        <form id="registro" class="form-group" enctype="multipart/form-data" method="post" action="Registro">
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-3">
                                         <label class="control-label" for="name">Nombre: </label>
                                     </div>
                                     <div class="col-sm-7">
-                                        <input type="text" id="name" name="name" class="form-control" placeholder="Titulo del evento"/>
+                                        <input type="text" 
+                                            class="form-control" 
+                                            id="name" 
+                                            name="nombre"
+                                            placeholder="Nombre del evento"
+                                            data-validation="required custom"
+                                            data-validation-regexp="[a-zA-Z0-9.!$¡?¿\s]+"
+                                            data-validation-error-msg-custom="Error"
+                                            data-validation-error-msg-required="Este campo es obligatorio">
                                     </div>
                                 </div>
                             </div>
@@ -87,7 +99,7 @@
                                         <label class="control-label" for="tipo">Tipo: </label>
                                     </div>
                                     <div class="col-sm-7">
-                                        <select id="tipo" name="tipo">
+                                        <select id="tipo" name="tipo" class="form-control">
                                             <option selected>Cine</option>
                                             <option>Teatro</option>
                                             <option>Concierto</option>
@@ -102,7 +114,15 @@
                                         <label class="control-label" for="precio">Precio: </label>
                                     </div>
                                     <div class="col-sm-7">
-                                        <input type="text" id="precio" name="precio" class="form-control" placeholder="99.00"/>
+                                        <input type="text" 
+                                            class="form-control" 
+                                            id="precio" 
+                                            name="precio"
+                                            placeholder="99.99"
+                                            data-validation="required custom"
+                                            data-validation-regexp="^[0-9]{1,4}\.?[0-9]{0,2}$"
+                                            data-validation-error-msg-custom="Valor n&uacite;merico no valido"
+                                            data-validation-error-msg-required="Este campo es obligatorio">
                                     </div>
                                 </div>
                             </div>
@@ -113,7 +133,15 @@
                                         <label class="control-label" for="asientos">No. de asientos: </label>
                                     </div>
                                     <div class="col-sm-7">
-                                        <input type="number" value="10" min="10" max="100" name="asientos" id="asientos" class="form-control"/>
+                                        <input type="number" 
+                                            class="form-control" 
+                                            id="asientos" 
+                                            value="10" 
+                                            min="10" 
+                                            max="100" 
+                                            name="asientos"
+                                            data-validation="numeric"
+                                            data-validation-error-msg-required="Este campo es obligatorio">
                                     </div>
                                 </div>
                             </div>
@@ -124,7 +152,15 @@
                                         <label class="control-label" for="fecha">Fecha: </label>
                                     </div>
                                     <div class="col-sm-7">
-                                        <input type="text" id="fecha" name="fecha" class="form-control" placeholder="yyyy-mm-dd"/>
+                                        <input type="text" 
+                                            class="form-control" 
+                                            id="fecha" 
+                                            name="fecha"
+                                            placeholder="yyyy-mm-dd"
+                                            data-validation="required custom"
+                                            data-validation-regexp="^\d{4}-\d{2}-\d{2}$"
+                                            data-validation-error-msg-custom="Formato de fecha no v&aacute;"
+                                            data-validation-error-msg-required="Este campo es obligatorio">
                                     </div>
                                 </div>
                             </div>
@@ -135,7 +171,12 @@
                                         <label class="control-label" for="foto">Cartel: </label>
                                     </div>
                                     <div class="col-sm-7">
-                                        <input type="file" id="foto" name="foto" class="form-control"/>
+                                        <input type="file" 
+                                            class="form-control" 
+                                            id="foto" 
+                                            name="foto"
+                                            data-validation="required"
+                                            data-validation-error-msg-required="Este campo es obligatorio">
                                     </div>
                                 </div>
                             </div>
@@ -146,7 +187,15 @@
                                         <label class="control-label" for="lugar">Lugar: </label>
                                     </div>
                                     <div class="col-sm-7">
-                                        <input type="text" id="lugar" name="lugar" class="form-control" placeholder="Av. algo "/>
+                                        <input type="text" 
+                                            class="form-control" 
+                                            id="lugar" 
+                                            name="lugar"
+                                            placeholder="Av siempre viva No 19009"
+                                            data-validation="required custom"
+                                            data-validation-regexp="[a-zA-Z0-9.!$¡?¿\s]+"
+                                            data-validation-error-msg-custom="Direci&oacute; no v&aacute;lida"
+                                            data-validation-error-msg-required="Este campo es obligatorio">
                                     </div>
                                 </div>
                             </div>
@@ -157,7 +206,14 @@
                                         <label class="control-label" for="desc">Descripci&oacute;n: </label>
                                     </div>
                                     <div class="col-sm-7">
-                                        <textarea id="desc" name="desc" class="form-control"></textarea>
+                                        <textarea
+                                            class="form-control" 
+                                            id="desc" 
+                                            name="desc"
+                                            data-validation="required custom"
+                                            data-validation-regexp="[a-zA-Z0-9.!$¡?¿\s]+"
+                                            data-validation-error-msg-custom="No puede contener caracteres especiales"
+                                            data-validation-error-msg-required="Este campo es obligatorio"></textarea>
                                     </div>
                                 </div>
                             </div>    
@@ -189,5 +245,8 @@
         <script src="js/jquery-3.2.0.min.js"></script>
         <script src="js/bootstrap.min.js"></script>
         <script src="js/registroTickets.js"></script>
+        <script type="text/javascript" src="plugins/lobibox/js/lobibox.min.js"></script>
+        <script type="text/javascript" src="plugins/form-validator/jquery.form-validator.min.js"></script>
+        <script src="js/registro.js"></script>
     </body>
 </html>

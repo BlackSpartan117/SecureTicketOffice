@@ -96,7 +96,7 @@ function consultarEventos(evento){
             for(var i = 0; i < listaEventos.length; i++){
                 htmlEventos += "<div class='col-sm-4 col-lg-4 col-md-4'>" +
                                     "<div class='thumbnail'>" +
-                                        "<img src='" + listaEventos[i].imagen + "' alt=''>" +
+                                        "<img src='" + listaEventos[i].imagen + "' height ='200' width='250' alt=''>" +
                                         "<br><br>" +
                                         "<div class='caption'>" +
                                             "<div class='row'>" +
@@ -112,12 +112,19 @@ function consultarEventos(evento){
                                         "<div class='ratings'>" +
                                             "<p class='pull-right'>12 reviews</p>" +
                                             "<p>";
-                                            for(var j = 0; j < 5; j++){
-                                                if(j <  listaEventos[i].estrellas){
+                                            /*for( var j = 0; j < 5; j++ ) {
+                                                if( j <  listaEventos[i].estrellas ) {
                                                     htmlEventos += "<i class='fa fa-star' aria-hidden='true'></i>";
-                                                }else{
+                                                } else{
                                                     htmlEventos += "<i class='fa fa-star-o' aria-hidden='true'></i>";
                                                 }
+                                            }*/
+                                            var n = 1 + Math.floor(Math.random() * 100) % 5;
+                                            for( var j = 0; j < n; j++ ){
+                                                htmlEventos += "<i class='fa fa-star' aria-hidden='true'></i>";
+                                            }
+                                            for( var j = 0; j < 5-n; j++ ){
+                                                htmlEventos += "<i class='fa fa-star-o' aria-hidden='true'></i>";
                                             }
                 htmlEventos +=              "</p>" +
                                         "</div>";

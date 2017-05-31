@@ -72,46 +72,40 @@ public class Ticket extends HttpServlet {
             //conectarConBanco( request, response );
             iniciarPagina( request, response );
             
-        } 
-        else if (accion != null && accion.equals("parametros")){
-             DiffieHellman(request,response);
-        }else {
+        } else if( accion != null && accion.equals("parametros") ) {
+             DiffieHellman( request,response );
+             
+        } else {
             response.getWriter().print("Error");
         }
     }
     
-    
-    private void DiffieHellman(HttpServletRequest reques,HttpServletResponse response){
-     
-          
+    private void DiffieHellman( HttpServletRequest reques, HttpServletResponse response ) {
         try {
             AlgorithmParameterGenerator paramGen = AlgorithmParameterGenerator.getInstance("DH");
-    paramGen.init(1024);
+            paramGen.init(1024);
 
-    AlgorithmParameters params = paramGen.generateParameters();
-    DHParameterSpec dhSpec;
-    dhSpec = (DHParameterSpec) params.getParameterSpec(DHParameterSpec.class);
-            
-    System.out.println("" + dhSpec.getP() + "\n" + dhSpec.getG() + "\n" + dhSpec.getL());
-    
-    JsonObjectBuilder respuesta = Json.createObjectBuilder();
-    
-    respuesta.add("primo", dhSpec.getP());
-    respuesta.add("generador",dhSpec.getG());
-    respuesta.add("longitud",dhSpec.getL());
-    
-    JsonObject o = respuesta.build();
-    
-    PrintWriter out = response.getWriter();
-    System.out.println(o);
-    out.print(o);
+            AlgorithmParameters params = paramGen.generateParameters();
+            DHParameterSpec dhSpec;
+            dhSpec = (DHParameterSpec) params.getParameterSpec(DHParameterSpec.class);
+
+            System.out.println("" + dhSpec.getP() + "\n" + dhSpec.getG() + "\n" + dhSpec.getL());
+
+            JsonObjectBuilder respuesta = Json.createObjectBuilder();
+
+            respuesta.add("primo", dhSpec.getP());
+            respuesta.add("generador",dhSpec.getG());
+            respuesta.add("longitud",dhSpec.getL());
+
+            JsonObject o = respuesta.build();
+
+            PrintWriter out = response.getWriter();
+            System.out.println(o);
+            out.print(o);
     
         } catch (InvalidParameterSpecException | IOException | NoSuchAlgorithmException ex) {
             
         }
-
-   
-    
     }
     /* Ejemplo extraido de http://www.theserverside.com/news/thread.tss?thread_id=21884
     ** http://programacionextrema.com/2015/11/26/realizar-una-peticion-post-en-java/*/
@@ -142,46 +136,13 @@ public class Ticket extends HttpServlet {
             conn.setDoOutput(true);
             conn.getOutputStream().write( postDataBytes );
             
-            /*Reader in = new BufferedReader( new InputStreamReader( conn.getInputStream(), "UTF-8" ) );
-            
-            for( int c = in.read(); c != -1; c = in.read() ) {
-                System.out.println( (char)c );
-            }*/
-            
             InputStream stream = conn.getInputStream();
             BufferedInputStream bin = new BufferedInputStream( stream );
-            long time = System.currentTimeMillis();
-            int i = 0;
+            int i;
             
             while( ( i = bin.read() ) != -1 ){
                 System.out.write( i );
             }
-            
-            /*
-            String direccionUrl = "http://localhost:8080/ServletGetPost/ServletBasico";
-            URL url = new URL( direccionUrl );
-            HttpURLConnection connection = ( HttpURLConnection ) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setDoOutput( true );
-            OutputStreamWriter ostream = new OutputStreamWriter( connection.getOutputStream() );
-            String buffer = "?a=3.0&b=23.3";
-            if( buffer != "" ) {
-                BufferedWriter out = new BufferedWriter( ostream );
-                //out.write( bufer );
-                out.flush();
-                out.close();
-            }
-            
-            InputStream stream = connection.getInputStream();
-            BufferedInputStream bin = new BufferedInputStream( stream );
-            long time = System.currentTimeMillis();
-            int i = 0;
-            
-            while( ( i = bin.read() ) != -1 ){
-                System.out.write( i );
-            }
-            bin.close();
-            connection.disconnect();*/
             
         } catch (MalformedURLException ex) {
             Logger.getLogger(Ticket.class.getName()).log(Level.SEVERE, null, ex);
