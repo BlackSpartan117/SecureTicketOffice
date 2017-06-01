@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
-    <!--<filter>
+    <filter>
         <description>Realiza una operacion previa y posterior al inicio de sesion.</description>
         <filter-name>LoginFilter</filter-name>
         <filter-class>controlador.LoginFilter</filter-class>
-        <init-param>
+        <!--<init-param>
             <description>Lista de usuarios permitidos para acceder a la  pagina de registro de tickets en linea</description>
             <param-name>UsuarioPermitido</param-name> 
-            <param-value>/conf/user.txt</param-value>
+            <param-value>/WEB-INF/user.json</param-value>
             <param-value>lokosforever@gmail.com</param-value>
             <param-value>unaContraseniaBienPerraYCifradaALV</param-value>
-        </init-param>
+        </init-param>-->
     </filter>
     <filter-mapping>
         <filter-name>LoginFilter</filter-name>
-        <url-pattern>/Login</url-pattern>
         <url-pattern>/registro.html</url-pattern>
-    </filter-mapping>-->
+    </filter-mapping>
+    
     <servlet>
         <servlet-name>Ticket</servlet-name>
         <servlet-class>controlador.Ticket</servlet-class>

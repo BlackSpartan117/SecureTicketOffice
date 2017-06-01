@@ -34,3 +34,43 @@ $.validate({
         return false;
     }
 });
+
+$(document).ready(function() {
+    var cookie = getCookie("registro");
+    
+    if( cookie !== "" ) {
+        alert("Registro exitoso!");
+        document.cookie = "registro=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/TicketESCOM/;";
+    }
+});
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+$("#logout").click( function() { 
+    document.cookie = "JSESSIONID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/TicketESCOM/;";
+    $.ajax({
+        'type':"POST",
+        'url': "Login",
+        data: { "logout":"logout" },
+        sucess: function( resp ) {
+            
+        }
+    });
+    location.href = "index.html";
+});
+

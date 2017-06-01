@@ -11,6 +11,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,7 +45,7 @@ public class RegistroTicket extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String name = request.getParameter("name");
+        String name = request.getParameter("nombre");
         String tipo = request.getParameter("tipo");
         String precio = request.getParameter("precio");
         String asientos = request.getParameter("asientos");
@@ -86,11 +87,16 @@ public class RegistroTicket extends HttpServlet {
         Evento ev = new Evento(name, tipo, Double.parseDouble( precio ), Integer.parseInt( asientos ), f.getTime(), contenidoFoto, lugar, desc);
         consulta.insertar( ev, fecha );
         
-        
-        
-        response.setContentType("text/html;charset=UTF-8");
-        response.getWriter().print("<h1>Hola</h1>");
-        response.getWriter().print("<img src='" + img + "'/>");
+        //response.setContentType("text/html;charset=UTF-8");
+        //response.getWriter().print("<h1>Hola</h1>");
+        //response.getWriter().print("<img src='" + img + "'/>");
+        //response.getWriter().print("<a href='" + "/TicketESCOM" + "'/>");
+        //response.getWriter().print("<script>alert('Registro exitoso')</script>");
+        //response.getWriter().print("Registro exitoso!");
+        Cookie galletita = new Cookie("registro", "exitoso");
+        galletita.setMaxAge( 4 );
+        response.addCookie( galletita );
+        response.sendRedirect("registro.html");
     }
 
     @Override

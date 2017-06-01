@@ -68,7 +68,7 @@ public class Ticket extends HttpServlet {
             System.out.println("\n\n\n\nOK\n\n\n");
             //response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            System.out.println("CONECTAR BANCO\n");
+            //System.out.println("CONECTAR BANCO\n");
             //conectarConBanco( request, response );
             iniciarPagina( request, response );
             

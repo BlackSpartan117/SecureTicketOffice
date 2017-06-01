@@ -19,6 +19,7 @@ package controlador;
  * usuarios revocados.
  *
  */
+import entidades.Cuenta;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import java.io.*;
@@ -42,8 +43,8 @@ public class LoginFilter implements Filter {
         this.ruta = filterConfig.getServletContext().getRealPath( filterConfig.getInitParameter( "UsuarioPermitido" ) );
         System.out.println("ruta " + ruta );
         // leer la lista de usuario revocados
-        revokeList = new java.util.ArrayList();
-        readConfig();
+        //revokeList = new java.util.ArrayList();
+        //readConfig();
     }
 
     /**
@@ -74,7 +75,7 @@ public class LoginFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 
-        // acción de inicio de sesión previa
+        /*// acción de inicio de sesión previa
         // obtener nombre de usuario 
         String username = req.getParameter("nameUser");
         String pass = req.getParameter("pass");
@@ -85,9 +86,22 @@ public class LoginFilter implements Filter {
             System.out.println("NO SECONTIENE NADA");
             res.sendRedirect("registro.html");
             return;
-        } 
+        } */
         
-        res.sendError( javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED );
+        HttpSession misession = (HttpSession) req.getSession(false);
+        
+        if( misession == null ) {
+            System.out.println("Sesion nula");
+            res.sendError( javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED );
+            
+        } else {
+            Cuenta cuenta = (Cuenta) misession.getAttribute("cuenta");
+            if( cuenta != null )
+                System.out.println("Sesion iniciada! " + cuenta.getEmail() + "  " + cuenta.getPass() );
+            else
+                System.out.println("Sesion iniciada! " + cuenta );
+        }
+        
         // llamar al siguiente filtro de la cadena: permitir que j_security_check autentique al 
         // usuario
         chain.doFilter( request, response );
