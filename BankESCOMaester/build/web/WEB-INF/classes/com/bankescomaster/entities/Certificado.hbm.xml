@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 1/06/2017 02:10:18 AM by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="com.bankescomaster.entities.Certificado" table="certificado" catalog="banco" optimistic-lock="version">
+        <id name="idCliente" type="java.lang.Integer">
+            <column name="idCliente" />
+            <generator class="identity" />
+        </id>
+        <property name="cumple" type="date">
+            <column name="cumple" length="10" not-null="true" />
+        </property>
+        <property name="apellido" type="string">
+            <column name="apellido" length="30" not-null="true" />
+        </property>
+        <property name="expiracion" type="date">
+            <column name="expiracion" length="10" not-null="true" />
+        </property>
+        <property name="publicKey" type="binary">
+            <column name="publicKey" not-null="true" />
+        </property>
+        <property name="firmaBank" type="binary">
+            <column name="firmaBank" not-null="true" />
+        </property>
+    </class>
+</hibernate-mapping>

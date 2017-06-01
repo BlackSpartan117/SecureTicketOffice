@@ -1,4 +1,4 @@
-package com.mkyong.test;
+
 
 import java.security.MessageDigest;
 
