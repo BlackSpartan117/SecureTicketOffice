@@ -193,15 +193,15 @@ function enviarResultadoDH(y, xb, p){
             var yServer = 0;
             yServer = resp;
             var clave = fastModularExponentiation(yServer, xb, p);
-            alert("Clave: " + fn["number->string"](clave));
+            //alert("Clave: " + fn["number->string"](clave));
             var hash = md5(fn["number->string"](clave));
             alert("Clave hash: " + hash);
             var bytesClave = parseHexString(hash);
-            alert(bytesClave[0] + ":" + bytesClave[1] + ":" + bytesClave[2] + ":" + bytesClave[3]);
-            var cifradorAES = sjcl.cipher.aes(bytesClave);
+            //alert(bytesClave[0] + ":" + bytesClave[1] + ":" + bytesClave[2] + ":" + bytesClave[3]);
+            /*var cifradorAES = sjcl.cipher.aes(bytesClave);
             var cifrado = cifradorAES.encrypt("HOLA");
             alert("cifrando: " + "HOLA");
-            alert("Descifrando: " + cifradorAES.decrypt(cifrado));
+            alert("Descifrando: " + cifradorAES.decrypt(cifrado));*/
         }
     });
 }

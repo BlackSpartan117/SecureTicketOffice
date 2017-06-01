@@ -13,8 +13,10 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.security.AlgorithmParameterGenerator;
 import java.security.AlgorithmParameters;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidParameterSpecException;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -120,17 +122,27 @@ public class Ticket extends HttpServlet {
     }
     
     private void claveDH(HttpServletRequest request, HttpServletResponse response){
-         String resultadoCliente = request.getParameter("resultado");
-         BigInteger res = new BigInteger(resultadoCliente);
-         BigInteger xa = randomBigInteger(primoDH);
-         BigInteger y = modulo(generadorDH, xa, primoDH);
-         try{
-            response.getWriter().print(y.toString());
-         }catch(IOException ioe){
-             ioe.printStackTrace();
-         }
-         claveSesion = modulo(res, xa, primoDH);
-         System.out.println("Clave acordada: " + claveSesion.toString());
+        try{
+            String resultadoCliente = request.getParameter("resultado");
+            BigInteger res = new BigInteger(resultadoCliente);
+            BigInteger xa = randomBigInteger(primoDH);
+            BigInteger y = modulo(generadorDH, xa, primoDH);
+            try{
+               response.getWriter().print(y.toString());
+            }catch(IOException ioe){
+                ioe.printStackTrace();
+            }
+            claveSesion = modulo(res, xa, primoDH);
+            MessageDigest md;
+            md = MessageDigest.getInstance("MD5");
+            byte[] mdbytes = md.digest(claveSesion.toString().getBytes());
+            String hexClave = bytesToHex(mdbytes);
+            System.out.println("Clave acordada: " + hexClave);
+            
+            //System.out.println("Clave acordada: " + claveSesion.toString());
+        }catch(NoSuchAlgorithmException nsae){
+            nsae.printStackTrace();
+        }
     }
     
 /* Ejemplo extraido de http://www.theserverside.com/news/thread.tss?thread_id=21884
@@ -268,6 +280,17 @@ public class Ticket extends HttpServlet {
             aRandomBigInt = new BigInteger(maxNumBitLength, rnd);
         } while (aRandomBigInt.compareTo(n.subtract(new BigInteger("2"))) > 0 || aRandomBigInt.compareTo(new BigInteger("2")) < 0); 
         return aRandomBigInt;
+    }
+    
+    private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
     }
 
 }
