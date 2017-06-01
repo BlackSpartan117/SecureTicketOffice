@@ -75,7 +75,9 @@ public class Ticket extends HttpServlet {
         } else if( accion != null && accion.equals("parametros") ) {
              DiffieHellman( request,response );
              
-        } else {
+        }else if (accion != null && accion.equals("resultadoDH")){
+            claveDH(request, response);
+        }else {
             response.getWriter().print("Error");
         }
     }
@@ -83,7 +85,7 @@ public class Ticket extends HttpServlet {
     private void DiffieHellman( HttpServletRequest reques, HttpServletResponse response ) {
         try {
             AlgorithmParameterGenerator paramGen = AlgorithmParameterGenerator.getInstance("DH");
-            paramGen.init(1024);
+            paramGen.init(512);
 
             AlgorithmParameters params = paramGen.generateParameters();
             DHParameterSpec dhSpec;
@@ -107,6 +109,12 @@ public class Ticket extends HttpServlet {
             
         }
     }
+    
+    private void claveDH(HttpServletRequest request, HttpServletResponse response){
+         String resultadoCliente = request.getParameter("iniciar");
+         BigInteger res = new BigInteger(resultadoCliente);
+    }
+    
     /* Ejemplo extraido de http://www.theserverside.com/news/thread.tss?thread_id=21884
     ** http://programacionextrema.com/2015/11/26/realizar-una-peticion-post-en-java/*/
     private void conectarConBanco( HttpServletRequest request, HttpServletResponse response ) {
