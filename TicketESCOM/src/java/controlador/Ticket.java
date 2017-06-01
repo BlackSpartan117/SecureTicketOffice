@@ -18,6 +18,7 @@ import java.security.spec.InvalidParameterSpecException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.spec.DHParameterSpec;
@@ -45,6 +46,9 @@ public class Ticket extends HttpServlet {
     private PropiedadConexion connProp;
     private ConexionMySQL conexionBD;
     private DAO consulta;
+    private BigInteger primoDH;
+    private BigInteger generadorDH;
+    private BigInteger claveSesion;
     
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -62,6 +66,7 @@ public class Ticket extends HttpServlet {
         String opcion = request.getParameter("iniciar");
         String accion = request.getParameter("accion");
         System.out.println( "OPCION  " + opcion );
+        System.out.println( "ACCION  " + accion );
         
         request.setCharacterEncoding("UTF-8");
         if( opcion != null && opcion.equals("iniciaPagina") ) {
@@ -94,9 +99,12 @@ public class Ticket extends HttpServlet {
             System.out.println("" + dhSpec.getP() + "\n" + dhSpec.getG() + "\n" + dhSpec.getL());
 
             JsonObjectBuilder respuesta = Json.createObjectBuilder();
+            
+            primoDH = dhSpec.getP();
+            generadorDH = dhSpec.getG();
 
-            respuesta.add("primo", dhSpec.getP());
-            respuesta.add("generador",dhSpec.getG());
+            respuesta.add("primo", primoDH);
+            respuesta.add("generador",generadorDH);
             respuesta.add("longitud",dhSpec.getL());
 
             JsonObject o = respuesta.build();
@@ -111,8 +119,17 @@ public class Ticket extends HttpServlet {
     }
     
     private void claveDH(HttpServletRequest request, HttpServletResponse response){
-         String resultadoCliente = request.getParameter("iniciar");
+         String resultadoCliente = request.getParameter("resultado");
          BigInteger res = new BigInteger(resultadoCliente);
+         BigInteger xa = randomBigInteger(primoDH);
+         BigInteger y = modulo(generadorDH, xa, primoDH);
+         try{
+            response.getWriter().print(y.toString());
+         }catch(IOException ioe){
+             ioe.printStackTrace();
+         }
+         claveSesion = modulo(res, xa, primoDH);
+         System.out.println("Clave acordada: " + claveSesion.toString());
     }
     
     /* Ejemplo extraido de http://www.theserverside.com/news/thread.tss?thread_id=21884
@@ -198,7 +215,7 @@ public class Ticket extends HttpServlet {
                     //.add("Fecha", e.getFecha().toString() )
                     .add("descripcion", e.getFecha().toString() )
                     .add("imagen", new String( e.getFoto() ) )
-                    .add("Lugar", e.getLugar() ) );
+                    .add("lugar", e.getLugar() ) );
         });
 
         value = values.build();
@@ -222,5 +239,33 @@ public class Ticket extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+    
+    private BigInteger modulo( BigInteger a, BigInteger b, BigInteger c ) {
+        BigInteger x = new BigInteger("1");
+        BigInteger y = a;
+        BigInteger zero = new BigInteger("0");
+        BigInteger dos = new BigInteger("2");
+
+        while( b.compareTo( zero ) == 1 ) {
+            if( b.mod( dos ).compareTo( new BigInteger("1") ) == 0 ) {
+                x = ( x.multiply( y ) ).mod( c );
+            }
+
+            y = ( y.multiply( y ) ).mod( c ); // squaring the base
+            b = b.divide( dos );
+        }
+
+        return x.mod( c );
+    }
+    
+    private BigInteger randomBigInteger(BigInteger n) {
+        Random rnd = new Random();
+        int maxNumBitLength = n.bitLength();
+        BigInteger aRandomBigInt;
+        do {
+            aRandomBigInt = new BigInteger(maxNumBitLength, rnd);
+        } while (aRandomBigInt.compareTo(n.subtract(new BigInteger("2"))) > 0 || aRandomBigInt.compareTo(new BigInteger("2")) < 0); 
+        return aRandomBigInt;
+    }
 
 }
