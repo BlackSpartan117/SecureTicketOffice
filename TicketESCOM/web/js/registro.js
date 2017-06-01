@@ -68,9 +68,8 @@ $("#logout").click( function() {
         'url': "Login",
         data: { "logout":"logout" },
         sucess: function( resp ) {
-            
+            location.href = "index.html";
         }
     });
-    location.href = "index.html";
 });
 

@@ -35,6 +35,7 @@ import negocio.ConexionMySQL;
 import negocio.DAO;
 import negocio.PropiedadConexion;
 import xml.WriteXML;
+import xml.XMLCuenta;
 
 /**
  *
@@ -68,16 +69,16 @@ public class Ticket extends HttpServlet {
             System.out.println("\n\n\n\nOK\n\n\n");
             //response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            //System.out.println("CONECTAR BANCO\n");
-            //conectarConBanco( request, response );
+                /* funcion de prueba */ 
+                conectarConBanco(request, response);
             iniciarPagina( request, response );
             
         } else if( accion != null && accion.equals("parametros") ) {
              DiffieHellman( request,response );
              
-        }else if (accion != null && accion.equals("resultadoDH")){
+        } else if (accion != null && accion.equals("resultadoDH")){
             claveDH(request, response);
-        }else {
+        } else {
             response.getWriter().print("Error");
         }
     }
@@ -124,6 +125,7 @@ public class Ticket extends HttpServlet {
             
             params.put("a", "10");
             params.put("b", "10");
+            params.put("xml", new XMLCuenta().crearXML() );
             
             StringBuilder postData = new StringBuilder();
             
