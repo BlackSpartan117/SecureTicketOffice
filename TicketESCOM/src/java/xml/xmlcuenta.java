@@ -22,7 +22,7 @@ public class xmlcuenta {
         datos_cuenta.addContent(nombre);
         datos_cuenta.addContent(new Element("noTarjeta").setText("123456"));
         datos_cuenta.addContent(new Element("cvv").setText("123"));
-        datos_cuenta.addContent(new Element("vigencia").setText("08-2017"));
+        datos_cuenta.addContent(new Element("vigencia").setText("2017-08"));
         datos_cuenta.addContent(new Element("precio").setText("1234.89"));
         
         doc.getRootElement().addContent(datos_cuenta);
@@ -32,7 +32,7 @@ public class xmlcuenta {
         datos_cuenta2.addContent(nombre2);
         datos_cuenta2.addContent(new Element("noTarjeta").setText("987654"));
         datos_cuenta2.addContent(new Element("cvv").setText("456"));
-        datos_cuenta2.addContent(new Element("vigencia").setText("10-2020"));
+        datos_cuenta2.addContent(new Element("vigencia").setText("2020-10"));
         datos_cuenta2.addContent(new Element("precio").setText("00.0"));
         doc.getRootElement().addContent(datos_cuenta2);
 
@@ -47,7 +47,6 @@ public class xmlcuenta {
 
         return xml;
     }
-    
     
     public String crearXML(String Tarjetauser, String precio,String cvv,String Titular,String Vencimiento) {
         String xml;
