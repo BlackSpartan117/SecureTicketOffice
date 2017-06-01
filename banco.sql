@@ -23,13 +23,14 @@ DROP TABLE IF EXISTS `certificado`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `certificado` (
-  `idCliente` int(11) NOT NULL AUTO_INCREMENT,
   `cumple` date NOT NULL,
+  `idCliente` int(11) NOT NULL,
   `apellido` varchar(20) NOT NULL,
   `expiracion` date NOT NULL,
   `publicKey` blob NOT NULL,
   `firmaBank` blob NOT NULL,
-  PRIMARY KEY (`idCliente`)
+  PRIMARY KEY (`idCliente`),
+  CONSTRAINT `certificado_ibfk_1` FOREIGN KEY (`idCliente`) REFERENCES `cuenta` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -50,10 +51,11 @@ DROP TABLE IF EXISTS `cuenta`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `cuenta` (
+  `nombre` varchar(20) NOT NULL,
   `id` int(11) NOT NULL,
-  `nombre` varchar(20) DEFAULT NULL,
-  `apellido` varchar(30) DEFAULT NULL,
+  `apellido` varchar(30) NOT NULL,
   `noTarjetaCredito` varchar(20) NOT NULL,
+  `cvv` varchar(3) NOT NULL,
   `saldo` double NOT NULL,
   `vigencia` date NOT NULL,
   PRIMARY KEY (`id`)
@@ -78,4 +80,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-01 14:03:01
+-- Dump completed on 2017-06-01 15:10:21
