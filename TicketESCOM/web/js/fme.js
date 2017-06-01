@@ -3,21 +3,24 @@
  * @returns {number}
  */
 var fastModularExponentiation = function(a, b, n) {
-  a = a % n;
-  var result = 1;
-  var x = a;
+    var sn = SchemeNumber;
+    var fn = sn.fn;
+    var ns = fn["number->string"];
+    a = fn.mod(a, n);
+    var result = fn["string->number"]("1");
+    var x = a;
 
-  while(b > 0){
-    var leastSignificantBit = b % 2;
-    b = Math.floor(b / 2);
+  while(fn[">"](b, "0")){
+    var leastSignificantBit = fn.mod(b, 2);
+    b = fn.floor(fn["/"](b,2));
 
-    if (leastSignificantBit == 1) {
-      result = result * x;
-      result = result % n;
+    if (fn["="](leastSignificantBit,"1")) {
+      result = fn["*"](result,x);
+      result = fn.mod(result, n);
     }
 
-    x = x * x;
-    x = x % n;
+    x = fn["*"](x, x);
+    x = fn.mod(x, n);
   }
   return result;
 };

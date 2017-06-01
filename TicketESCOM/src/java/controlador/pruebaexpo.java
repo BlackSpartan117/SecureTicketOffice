@@ -6,6 +6,8 @@
 package controlador;
 
 import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.util.Random;
 
 /**
  *
@@ -13,8 +15,9 @@ import java.math.BigInteger;
  */
 public class pruebaexpo {
     public static void main(String[] args) {
-        BigInteger mod = modulo( new BigInteger("3"), new BigInteger("15"), new BigInteger("7") );
+        BigInteger mod = modulo( new BigInteger("7"), new BigInteger("12"), new BigInteger("10"));
         System.out.println(""+mod);
+        System.out.println(randomBigInteger(new BigInteger("10")));
     }
     
     static BigInteger modulo( BigInteger a, BigInteger b, BigInteger c ) {
@@ -29,9 +32,20 @@ public class pruebaexpo {
             }
 
             y = ( y.multiply( y ) ).mod( c ); // squaring the base
-            b.divide( dos );
+            b = b.divide( dos );
         }
 
         return x.mod( c );
+    }
+    
+    public static BigInteger randomBigInteger(BigInteger n) {
+        Random rnd = new Random();
+        int maxNumBitLength = n.bitLength();
+        BigInteger aRandomBigInt;
+        do {
+            aRandomBigInt = new BigInteger(maxNumBitLength, rnd);
+            // compare random number lessthan ginven number
+        } while (aRandomBigInt.compareTo(n.subtract(new BigInteger("2"))) > 0 || aRandomBigInt.compareTo(new BigInteger("2")) < 0); 
+        return aRandomBigInt;
     }
 }

@@ -96,7 +96,7 @@ function consultarEventos(evento){
             for(var i = 0; i < listaEventos.length; i++){
                 htmlEventos += "<div class='col-sm-4 col-lg-4 col-md-4'>" +
                                     "<div class='thumbnail'>" +
-                                        "<img src='" + listaEventos[i].imagen + "' height ='200' width='250' alt=''>" +
+                                        "<img src='" + listaEventos[i].imagen + "' height ='' width='' alt=''>" +
                                         "<br><br>" +
                                         "<div class='caption'>" +
                                             "<div class='row'>" +
@@ -107,7 +107,8 @@ function consultarEventos(evento){
                                                     "<h4>$" + listaEventos[i].precio + "</h4>" +
                                                 "</div>" +
                                             "</div>" +
-                                            "<p>" + listaEventos[i].descripcion + "</p>" +
+                                            "<p> Fecha: " + listaEventos[i].descripcion + "</p>" +
+                                            "<p> Lugar: " + listaEventos[i].lugar + "</p>" +
                                         "</div>" +
                                         "<div class='ratings'>" +
                                             "<p class='pull-right'>12 reviews</p>" +
@@ -154,33 +155,45 @@ function handShake(){
         'url': 'Ticket',
         'data': {'accion': 'parametros'},
         success: function(resp){
-            var parametros = $.parseJSON(resp);
-            var primo = 0;
-            var generador = 0;
-            var longitud = 0;
-            primo = parametros.primo;
-            generador = parametros.generador;
-            longitud = parametros.longitud;
-            var x = Math.random();
-            x *= primo - 4;
-            x+=2;
-            x = Math.floor(x);
-            var y = fastModularExponentiation(generador, x, primo);
-            enviarResultadoDH(y, x, primo);
+            //alert(resp);
+            var i1 = resp.indexOf("primo");
+            var i2 = resp.indexOf("generador");
+            var i3 = resp.indexOf("longitud");
+            var primoStr = resp.substring(i1 + 7, i2 - 2);
+            var genStr = resp.substring(i2 + 11, i3 - 2);
+            var sn = SchemeNumber;
+            var fn = sn.fn;
+            var ns = fn["number->string"];
+            
+            var primo = fn["string->number"](primoStr);
+            var generador = fn["string->number"](genStr);
+            var random = fn["string->number"]("0");
+            
+            if(sjcl.random.isReady(10)) {
+                do{
+                    var resultado = sjcl.random.randomWords(1, 10)[0];
+                }while(resultado < 2);
+                random = fn["+"](resultado, 0);
+            }
+            var y = fastModularExponentiation(generador, random, primo);
+            enviarResultadoDH(y, random, primo);
         }
     });
 }
 
 function enviarResultadoDH(y, xb, p){
+    var sn = SchemeNumber;
+    var fn = sn.fn;
+    var ns = fn["number->string"];
     $.ajax({
         'type': 'POST',
         'url': 'Ticket',
-        'data': {'accion': 'resultadoDH', 'resultado': y},
+        'data': {'accion': 'resultadoDH', 'resultado': fn["number->string"](y)},
         success: function(resp){
             var yServer = 0;
             yServer = resp;
             var clave = fastModularExponentiation(yServer, xb, p);
-            alert(clave);
+            alert("Clave: " + fn["number->string"](clave));
         }
     });
 }
