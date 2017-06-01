@@ -35,8 +35,8 @@ import javax.servlet.http.HttpServletResponse;
 import negocio.ConexionMySQL;
 import negocio.DAO;
 import negocio.PropiedadConexion;
-import xml.WriteXML;
-import xml.XMLCuenta;
+import xml.xmlcuenta;
+
 
 /**
  *
@@ -142,7 +142,7 @@ public class Ticket extends HttpServlet {
             
             params.put("a", "10");
             params.put("b", "10");
-            params.put("xml", new XMLCuenta().crearXML() );
+            params.put("xml", new xmlcuenta().crearXML() );
             
             StringBuilder postData = new StringBuilder();
             
