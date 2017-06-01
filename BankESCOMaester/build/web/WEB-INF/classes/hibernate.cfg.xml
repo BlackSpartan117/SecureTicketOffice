@@ -48,7 +48,7 @@ Contributor(s):
     <property name="hibernate.connection.password">root</property>
     <property name="hibernate.show_sql">true</property>
     <property name="hibernate.query.factory_class">org.hibernate.hql.internal.classic.ClassicQueryTranslatorFactory</property>
-    <mapping resource="com/bankescomaster/entities/Cuenta.hbm.xml"/>
-    <mapping resource="com/bankescomaster/entities/Certificado.hbm.xml"/>
+    <mapping resource="com/bankescomaester/entities/Certificado.hbm.xml"/>
+    <mapping resource="com/bankescomaester/entities/Cuenta.hbm.xml"/>
   </session-factory>
 </hibernate-configuration>

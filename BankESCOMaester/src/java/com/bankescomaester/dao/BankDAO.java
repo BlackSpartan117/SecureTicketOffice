@@ -6,9 +6,8 @@
 package com.bankescomaester.dao;
 
 import banco.util.NewHibernateUtil;
-import com.bankescomaster.entities.Cuenta;
+import com.bankescomaester.entities.Cuenta;
 import java.util.List;
-import net.sf.ehcache.hibernate.HibernateUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
