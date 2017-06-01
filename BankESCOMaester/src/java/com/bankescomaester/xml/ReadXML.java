@@ -5,13 +5,16 @@
  */
 package com.bankescomaester.xml;
 
+import com.bankescomaester.entities.Cuenta;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.LinkedList;
 import java.util.List;
-import org.jdom2.Content;
 import org.jdom2.Document;         // |
 import org.jdom2.Element;          // |\ Librerías
 import org.jdom2.JDOMException;    // |/ JDOM
@@ -41,16 +44,21 @@ public class ReadXML {
 
             //Se obtiene la lista de hijos de la raiz
             List<Element> list = rootNode.getChildren();
+            Cuenta cuenta;
+            LinkedList<Cuenta> cuentas = new LinkedList<>();
             
             //Se recorre la lista de hijos
             for( int i = 0; i < list.size(); i++ ) {
                 System.out.println( "ELEMENTO " + list.get(i).toString() );
                 Element elemento = (Element) list.get(i);
+                cuenta = new Cuenta();
                 
                 for( Element e : elemento.getChildren() ) {
                     System.out.println("ELEMENTO e.value " + " " + e.getName() + " " + e.getValue() );
+                    cuenta = setPropiedad( cuenta, e.getName(), e.getValue() );
                 }
                 
+                cuentas.add( cuenta );
                 /*//Se obtiene el elemento 'tabla'
                 Element tabla = (Element) list.get(i);
 
@@ -88,5 +96,30 @@ public class ReadXML {
         } catch (JDOMException jdomex) {
             System.out.println(jdomex.getMessage());
         }
+    }
+    
+    private Cuenta setPropiedad( Cuenta c, String etiqueta, String propiedad ) {
+        switch( etiqueta ) {
+            case "nombre":
+                c.setNombre(propiedad );
+                break;
+            case "noTarjeta":
+                c.setNoTarjetaCredito(propiedad );
+                break;
+            case "cvv":
+                c.setCvv(propiedad );
+                break;
+            case "vigencia":
+                Calendar fecha = new GregorianCalendar();
+                fecha.set(Integer.parseInt(propiedad.split("-")[0] ), Integer.parseInt(propiedad.split("-")[1] ), 1 );
+                
+                c.setVigencia( fecha.getTime() );
+                break;
+            case "precio":
+                c.setSaldo(Double.parseDouble(propiedad ) );
+                break;
+        }
+        
+        return c;
     }
 }

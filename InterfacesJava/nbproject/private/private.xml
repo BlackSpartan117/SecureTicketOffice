@@ -3,7 +3,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/kars/NetBeansProjects/InterfacesJava/src/Ventanas/Interfaz.java</file>
+            <file>file:/home/kars/Escritorio/SecureTicketOffice/InterfacesJava/src/Ventanas/Interfaz_1.java</file>
+            <file>file:/home/kars/Escritorio/SecureTicketOffice/InterfacesJava/src/DAO/CuentaDAO.java</file>
+            <file>file:/home/kars/Escritorio/SecureTicketOffice/InterfacesJava/src/Ventanas/Registro.java</file>
+            <file>file:/home/kars/Escritorio/SecureTicketOffice/InterfacesJava/src/Ventanas/ConexionSQL.java</file>
+            <file>file:/home/kars/Escritorio/SecureTicketOffice/InterfacesJava/src/entidades/cuenta.java</file>
+            <file>file:/home/kars/Escritorio/SecureTicketOffice/InterfacesJava/src/DAO/config.properties</file>
+            <file>file:/home/kars/Escritorio/SecureTicketOffice/InterfacesJava/src/entidades/certificado.java</file>
         </group>
     </open-files>
 </project-private>

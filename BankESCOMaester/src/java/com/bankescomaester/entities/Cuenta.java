@@ -1,5 +1,5 @@
-package com.bankescomaster.entities;
-// Generated 1/06/2017 02:10:16 AM by Hibernate Tools 4.3.1
+package com.bankescomaester.entities;
+// Generated 1/06/2017 03:13:49 PM by Hibernate Tools 4.3.1
 
 
 import java.util.Date;
@@ -10,35 +10,44 @@ import java.util.Date;
 public class Cuenta  implements java.io.Serializable {
 
 
-     private Integer id;
+     private int id;
      private String nombre;
      private String apellido;
      private String noTarjetaCredito;
+     private String cvv;
      private double saldo;
      private Date vigencia;
+     private Certificado certificado;
 
     public Cuenta() {
     }
 
 	
-    public Cuenta(String nombre, String noTarjetaCredito, double saldo) {
+    public Cuenta(int id, String nombre, String apellido, String noTarjetaCredito, String cvv, double saldo, Date vigencia) {
+        this.id = id;
         this.nombre = nombre;
+        this.apellido = apellido;
         this.noTarjetaCredito = noTarjetaCredito;
+        this.cvv = cvv;
         this.saldo = saldo;
+        this.vigencia = vigencia;
     }
-    public Cuenta(String nombre, String apellido, String noTarjetaCredito, double saldo, Date vigencia) {
+    public Cuenta(int id, String nombre, String apellido, String noTarjetaCredito, String cvv, double saldo, Date vigencia, Certificado certificado) {
+       this.id = id;
        this.nombre = nombre;
        this.apellido = apellido;
        this.noTarjetaCredito = noTarjetaCredito;
+       this.cvv = cvv;
        this.saldo = saldo;
        this.vigencia = vigencia;
+       this.certificado = certificado;
     }
    
-    public Integer getId() {
+    public int getId() {
         return this.id;
     }
     
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
     public String getNombre() {
@@ -62,6 +71,13 @@ public class Cuenta  implements java.io.Serializable {
     public void setNoTarjetaCredito(String noTarjetaCredito) {
         this.noTarjetaCredito = noTarjetaCredito;
     }
+    public String getCvv() {
+        return this.cvv;
+    }
+    
+    public void setCvv(String cvv) {
+        this.cvv = cvv;
+    }
     public double getSaldo() {
         return this.saldo;
     }
@@ -75,6 +91,13 @@ public class Cuenta  implements java.io.Serializable {
     
     public void setVigencia(Date vigencia) {
         this.vigencia = vigencia;
+    }
+    public Certificado getCertificado() {
+        return this.certificado;
+    }
+    
+    public void setCertificado(Certificado certificado) {
+        this.certificado = certificado;
     }
 
 

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cuentas>
+    <datos_cuenta>
+        <nombre></nombre>
+        <apellido></apellido>
+        <noTarjeta></noTarjeta>
+        <vigencia></vigencia>
+    </datos_cuenta>
+</cuentas>

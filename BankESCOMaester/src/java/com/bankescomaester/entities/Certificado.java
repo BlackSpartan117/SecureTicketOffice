@@ -1,5 +1,5 @@
-package com.bankescomaster.entities;
-// Generated 1/06/2017 02:10:16 AM by Hibernate Tools 4.3.1
+package com.bankescomaester.entities;
+// Generated 1/06/2017 03:13:49 PM by Hibernate Tools 4.3.1
 
 
 import java.util.Date;
@@ -10,7 +10,8 @@ import java.util.Date;
 public class Certificado  implements java.io.Serializable {
 
 
-     private Integer idCliente;
+     private int idCliente;
+     private Cuenta cuenta;
      private Date cumple;
      private String apellido;
      private Date expiracion;
@@ -20,7 +21,8 @@ public class Certificado  implements java.io.Serializable {
     public Certificado() {
     }
 
-    public Certificado(Date cumple, String apellido, Date expiracion, byte[] publicKey, byte[] firmaBank) {
+    public Certificado(Cuenta cuenta, Date cumple, String apellido, Date expiracion, byte[] publicKey, byte[] firmaBank) {
+       this.cuenta = cuenta;
        this.cumple = cumple;
        this.apellido = apellido;
        this.expiracion = expiracion;
@@ -28,12 +30,19 @@ public class Certificado  implements java.io.Serializable {
        this.firmaBank = firmaBank;
     }
    
-    public Integer getIdCliente() {
+    public int getIdCliente() {
         return this.idCliente;
     }
     
-    public void setIdCliente(Integer idCliente) {
+    public void setIdCliente(int idCliente) {
         this.idCliente = idCliente;
+    }
+    public Cuenta getCuenta() {
+        return this.cuenta;
+    }
+    
+    public void setCuenta(Cuenta cuenta) {
+        this.cuenta = cuenta;
     }
     public Date getCumple() {
         return this.cumple;
