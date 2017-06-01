@@ -155,9 +155,35 @@ function handShake(){
         'data': {'accion': 'parametros'},
         success: function(resp){
             var parametros = $.parseJSON(resp);
-            alert(parametros.longitud);
+            var primo = 0;
+            var generador = 0;
+            var longitud = 0;
+            primo = parametros.primo;
+            generador = parametros.generador;
+            longitud = parametros.longitud;
+            var x = Math.random();
+            x *= primo - 4;
+            x+=2;
+            x = Math.floor(x);
+            var y = fastModularExponentiation(generador, x, primo);
+            enviarResultadoDH(y, x, primo);
         }
     });
 }
-//handShake();
+
+function enviarResultadoDH(y, xb, p){
+    $.ajax({
+        'type': 'POST',
+        'url': 'Ticket',
+        'data': {'accion': 'resultadoDH', 'resultado': y},
+        success: function(resp){
+            var yServer = 0;
+            yServer = resp;
+            var clave = fastModularExponentiation(yServer, xb, p);
+            alert(clave);
+        }
+    });
+}
+
+handShake();
 consultarEventos('C');
