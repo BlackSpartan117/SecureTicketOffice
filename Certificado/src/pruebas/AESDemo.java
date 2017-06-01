@@ -26,7 +26,7 @@ public class AESDemo {
     private static final String password = "test";
     private static String salt;
     private static int pswdIterations = 65536  ;
-    private static int keySize = 256;
+    private static int keySize = 128;
     private byte[] ivBytes;
  
     public String encrypt(String plainText) throws Exception {   
