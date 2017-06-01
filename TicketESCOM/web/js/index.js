@@ -194,6 +194,8 @@ function enviarResultadoDH(y, xb, p){
             yServer = resp;
             var clave = fastModularExponentiation(yServer, xb, p);
             alert("Clave: " + fn["number->string"](clave));
+            var hash = md5(fn["number->string"](clave));
+            alert("Clave hash: " + hash);
         }
     });
 }
