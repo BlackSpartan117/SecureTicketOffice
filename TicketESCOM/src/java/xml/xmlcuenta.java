@@ -23,7 +23,7 @@ public class xmlcuenta {
         Element cuenta = new Element("cuenta");
         Document doc = new Document(cuenta);
 
-        Element datos_cuenta = new Element("dato_cuenta");
+        Element datos_cuenta = new Element("datos_cuenta");
         datos_cuenta.addContent(new Element("nombre").setText("yong"));
         datos_cuenta.addContent(new Element("numerocuenta").setText("123456"));
         doc.getRootElement().addContent(datos_cuenta);
