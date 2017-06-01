@@ -70,10 +70,6 @@ public class Certificado  implements java.io.Serializable {
     public void setFirmaBank(byte[] firmaBank) {
         this.firmaBank = firmaBank;
     }
-
-
-
-
 }
 
 
