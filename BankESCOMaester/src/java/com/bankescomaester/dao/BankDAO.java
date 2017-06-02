@@ -19,21 +19,38 @@ import org.hibernate.Transaction;
  */
 public class BankDAO {
     
-    public void consultar( Cuenta c ) {
+    public Cuenta getCuentaById( String tarjetaCredito ) {
         Session sesion = NewHibernateUtil.getSessionFactory().openSession();
         Transaction trans = sesion.beginTransaction();
         String hql = "FROM Cuenta as c WHERE c.noTarjetaCredito =:tarjeta";
-        List<Cuenta> cuentas;
+        List<Cuenta> cuentas = null;
         
         try {
             Query q = sesion.createQuery( hql );
-            q.setParameter("tarjeta", c.getNoTarjetaCredito() );
+            q.setParameter("tarjeta", tarjetaCredito );
             cuentas = q.list();
             sesion.flush();
             trans.commit();
         } catch( HibernateException e ) {
             e.printStackTrace();
         }
+        
+        if( cuentas != null )
+            return cuentas.get(0);
+        
+        return null;
     }
     
+    public void updateCuenta( Cuenta c ) {
+        Session sesion = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction trans = sesion.beginTransaction();
+        
+        try {
+            sesion.saveOrUpdate( c );
+            sesion.flush();
+            trans.commit();
+        } catch( HibernateException e ) {
+            e.printStackTrace();
+        }
+    }
 }

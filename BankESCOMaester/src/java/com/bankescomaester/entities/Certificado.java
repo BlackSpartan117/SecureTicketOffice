@@ -1,5 +1,5 @@
 package com.bankescomaester.entities;
-// Generated 1/06/2017 03:13:49 PM by Hibernate Tools 4.3.1
+// Generated 1/06/2017 09:37:07 PM by Hibernate Tools 4.3.1
 
 
 import java.util.Date;
