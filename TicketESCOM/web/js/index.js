@@ -1,3 +1,5 @@
+var bytesClave; /*Clave de sesion*/
+
 $('.boton-comprar').click(function(){
     $('#modal-comprar').attr('data-evento', $(this).attr('data-evento'));
     $('#modal-comprar').modal({
@@ -196,14 +198,60 @@ function enviarResultadoDH(y, xb, p){
             //alert("Clave: " + fn["number->string"](clave));
             var hash = md5(fn["number->string"](clave));
             alert("Clave hash: " + hash);
-            var bytesClave = parseHexString(hash);
-            //alert(bytesClave[0] + ":" + bytesClave[1] + ":" + bytesClave[2] + ":" + bytesClave[3]);
-            /*var cifradorAES = sjcl.cipher.aes(bytesClave);
-            var cifrado = cifradorAES.encrypt("HOLA");
-            alert("cifrando: " + "HOLA");
-            alert("Descifrando: " + cifradorAES.decrypt(cifrado));*/
+            bytesClave = parseHexString(hash);
+            //encrypt("Mensaje secreto enviado por aes");
+            cifrar();
         }
     });
+}
+
+function cifrar(){
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'Ticket', true);
+    //xhr.responseType = 'blob';
+    xhr.responseType = 'arraybuffer';
+    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhr.onload = function(e) {
+      if (this.status == 200) {
+        // get binary data as a response
+        //var blob = this.response;
+        var responseArray = new Uint8Array(this.response);
+        var texto = sjcl.codec.bytes.toBits(responseArray);
+        alert(sjcl.codec.utf8String.fromBits(texto));
+      }
+    };
+
+    xhr.send('accion=cifrar');
+}
+
+function encrypt(cadena){
+    var p = sjcl.json.defaults; 
+    var iv  = new Uint8Array(16);
+    for (var i = 0; i < iv.length; ++i) {
+        iv[i] = 0;
+    }
+    p.iv = sjcl.codec.bytes.toBits(iv);
+    p.salt = [];
+    p.mode = "cbc";
+    var aes = new sjcl.cipher.aes(bytesClave);
+    sjcl.beware["CBC mode is dangerous because it doesn't protect message integrity."]();
+    var encrypted = sjcl.mode[p.mode].encrypt(aes, sjcl.codec.utf8String.toBits(cadena), p.iv);
+    decrypt(encrypted);
+}
+
+function decrypt(ciphertext){
+    var p = sjcl.json.defaults; 
+    var iv  = new Uint8Array(16);
+    for (var i = 0; i < iv.length; ++i) {
+        iv[i] = 0;
+    }
+    p.iv = sjcl.codec.bytes.toBits(iv);
+    p.salt = [];
+    p.mode = "cbc";
+    var aes = new sjcl.cipher.aes(bytesClave);
+    sjcl.beware["CBC mode is dangerous because it doesn't protect message integrity."]();
+    var decrypted = sjcl.mode[p.mode].decrypt(aes, ciphertext, p.iv);
+    alert(sjcl.codec.utf8String.fromBits(decrypted));
 }
 
 function parseHexString(str) { 

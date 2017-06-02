@@ -30,6 +30,7 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -76,7 +77,7 @@ public class Ticket extends HttpServlet {
             //response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
                 /* funcion de prueba */ 
-            conectarConBanco(request, response);
+            //conectarConBanco(request, response);
             iniciarPagina( request, response );
             
         } else if( accion != null && accion.equals("parametros") ) {
@@ -84,6 +85,8 @@ public class Ticket extends HttpServlet {
              
         } else if (accion != null && accion.equals("resultadoDH")){
             claveDH(request, response);
+        } else if (accion != null && accion.equals("cifrar")){
+            cifrar(request, response);
         } else {
             response.getWriter().print("Error");
         }
@@ -141,6 +144,16 @@ public class Ticket extends HttpServlet {
             //System.out.println("Clave acordada: " + claveSesion.toString());
         }catch(NoSuchAlgorithmException nsae){
             nsae.printStackTrace();
+        }
+    }
+    
+    private void cifrar(HttpServletRequest request, HttpServletResponse response){
+        try{
+            ServletOutputStream sos = response.getOutputStream();
+            sos.write("Este es el mensaje original pasado a binario".getBytes());
+            sos.flush();
+            sos.close();
+        }catch(IOException ioe){
         }
     }
     
