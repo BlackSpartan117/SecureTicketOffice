@@ -18,21 +18,21 @@ public class xmlcuenta {
         Document doc = new Document(cuenta);
 
         Element datos_cuenta = new Element("datos_cuenta");
-        Element nombre =new Element("nombre").setText("usuario");
+        Element nombre =new Element("nombre").setText("Josh Holmes");
         datos_cuenta.addContent(nombre);
-        datos_cuenta.addContent(new Element("noTarjeta").setText("123456"));
+        datos_cuenta.addContent(new Element("noTarjeta").setText("1234567890123456"));
         datos_cuenta.addContent(new Element("cvv").setText("123"));
-        datos_cuenta.addContent(new Element("vigencia").setText("2017-08"));
-        datos_cuenta.addContent(new Element("precio").setText("1234.89"));
+        datos_cuenta.addContent(new Element("vigencia").setText("2017-12"));
+        datos_cuenta.addContent(new Element("precio").setText("1235.50"));
         
         doc.getRootElement().addContent(datos_cuenta);
         
         Element datos_cuenta2 = new Element("datos_cuenta");
-        Element nombre2 =new Element("nombre").setText("Tickets");
+        Element nombre2 =new Element("nombre").setText("Tickets ESCOM");
         datos_cuenta2.addContent(nombre2);
-        datos_cuenta2.addContent(new Element("noTarjeta").setText("987654"));
-        datos_cuenta2.addContent(new Element("cvv").setText("456"));
-        datos_cuenta2.addContent(new Element("vigencia").setText("2020-10"));
+        datos_cuenta2.addContent(new Element("noTarjeta").setText("1234567890123455"));
+        datos_cuenta2.addContent(new Element("cvv").setText("666"));
+        datos_cuenta2.addContent(new Element("vigencia").setText("2018-12"));
         datos_cuenta2.addContent(new Element("precio").setText("00.0"));
         doc.getRootElement().addContent(datos_cuenta2);
 
@@ -79,8 +79,8 @@ public class xmlcuenta {
         xmlOutput.setFormat(Format.getPrettyFormat());
         xml = xmlOutput.outputString(doc);
 
-        System.out.println();
-        System.out.println("File Saved! " + xml);
+        //System.out.println();
+        //System.out.println("File Saved! " + xml);
 
         return xml;
     }

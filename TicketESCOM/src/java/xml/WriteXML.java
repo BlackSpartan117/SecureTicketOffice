@@ -43,8 +43,8 @@ public class WriteXML {
         xmlOutput.setFormat(Format.getPrettyFormat());
         xml = xmlOutput.outputString(doc);
 
-        System.out.println();
-        System.out.println("File Saved! " + xml);
+        //System.out.println();
+        //System.out.println("File Saved! " + xml);
 
         return xml;
     }
