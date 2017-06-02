@@ -1,5 +1,5 @@
 package com.bankescomaester.entities;
-// Generated 1/06/2017 03:13:49 PM by Hibernate Tools 4.3.1
+// Generated 1/06/2017 09:37:07 PM by Hibernate Tools 4.3.1
 
 
 import java.util.Date;
@@ -10,7 +10,7 @@ import java.util.Date;
 public class Cuenta  implements java.io.Serializable {
 
 
-     private int id;
+     private Integer id;
      private String nombre;
      private String apellido;
      private String noTarjetaCredito;
@@ -23,8 +23,7 @@ public class Cuenta  implements java.io.Serializable {
     }
 
 	
-    public Cuenta(int id, String nombre, String apellido, String noTarjetaCredito, String cvv, double saldo, Date vigencia) {
-        this.id = id;
+    public Cuenta(String nombre, String apellido, String noTarjetaCredito, String cvv, double saldo, Date vigencia) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.noTarjetaCredito = noTarjetaCredito;
@@ -32,8 +31,7 @@ public class Cuenta  implements java.io.Serializable {
         this.saldo = saldo;
         this.vigencia = vigencia;
     }
-    public Cuenta(int id, String nombre, String apellido, String noTarjetaCredito, String cvv, double saldo, Date vigencia, Certificado certificado) {
-       this.id = id;
+    public Cuenta(String nombre, String apellido, String noTarjetaCredito, String cvv, double saldo, Date vigencia, Certificado certificado) {
        this.nombre = nombre;
        this.apellido = apellido;
        this.noTarjetaCredito = noTarjetaCredito;
@@ -43,11 +41,11 @@ public class Cuenta  implements java.io.Serializable {
        this.certificado = certificado;
     }
    
-    public int getId() {
+    public Integer getId() {
         return this.id;
     }
     
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
     public String getNombre() {
