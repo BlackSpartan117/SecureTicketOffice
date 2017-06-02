@@ -216,8 +216,9 @@ function cifrar(){
         // get binary data as a response
         //var blob = this.response;
         var responseArray = new Uint8Array(this.response);
-        var texto = sjcl.codec.bytes.toBits(responseArray);
-        alert(sjcl.codec.utf8String.fromBits(texto));
+        decrypt(responseArray);
+        //var texto = sjcl.codec.bytes.toBits(responseArray);
+        //alert(sjcl.codec.utf8String.fromBits(texto));
       }
     };
 
@@ -239,18 +240,27 @@ function encrypt(cadena){
     decrypt(encrypted);
 }
 
-function decrypt(ciphertext){
+function decrypt(cifrado){
     var p = sjcl.json.defaults; 
     var iv  = new Uint8Array(16);
+    for (var i = 0; i < iv.length; i++) {
+        iv[i] = cifrado[i];
+    }
+    var ciphertext  = new Uint8Array(cifrado.length - iv.length);
+    for (var i = 0; i < ciphertext.length; i++) {
+        ciphertext[i] = cifrado[i + iv.length];
+    }
+    /*var iv  = new Uint8Array(16);
     for (var i = 0; i < iv.length; ++i) {
         iv[i] = 0;
-    }
+    }*/
     p.iv = sjcl.codec.bytes.toBits(iv);
+    var texto = sjcl.codec.bytes.toBits(ciphertext);
     p.salt = [];
     p.mode = "cbc";
     var aes = new sjcl.cipher.aes(bytesClave);
     sjcl.beware["CBC mode is dangerous because it doesn't protect message integrity."]();
-    var decrypted = sjcl.mode[p.mode].decrypt(aes, ciphertext, p.iv);
+    var decrypted = sjcl.mode[p.mode].decrypt(aes, texto, p.iv);
     alert(sjcl.codec.utf8String.fromBits(decrypted));
 }
 

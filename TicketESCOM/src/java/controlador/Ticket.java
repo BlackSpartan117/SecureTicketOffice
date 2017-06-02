@@ -12,6 +12,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.security.AlgorithmParameterGenerator;
 import java.security.AlgorithmParameters;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidParameterSpecException;
@@ -22,7 +23,12 @@ import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.DHParameterSpec;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
@@ -51,7 +57,7 @@ public class Ticket extends HttpServlet {
     private DAO consulta;
     private BigInteger primoDH;
     private BigInteger generadorDH;
-    private BigInteger claveSesion;
+    private byte []claveSesion;
     
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -134,11 +140,11 @@ public class Ticket extends HttpServlet {
             }catch(IOException ioe){
                 ioe.printStackTrace();
             }
-            claveSesion = modulo(res, xa, primoDH);
+            BigInteger clave = modulo(res, xa, primoDH);
             MessageDigest md;
             md = MessageDigest.getInstance("MD5");
-            byte[] mdbytes = md.digest(claveSesion.toString().getBytes());
-            String hexClave = bytesToHex(mdbytes);
+            claveSesion = md.digest(clave.toString().getBytes());
+            String hexClave = bytesToHex(claveSesion);
             System.out.println("Clave acordada: " + hexClave);
             
             //System.out.println("Clave acordada: " + claveSesion.toString());
@@ -150,10 +156,21 @@ public class Ticket extends HttpServlet {
     private void cifrar(HttpServletRequest request, HttpServletResponse response){
         try{
             ServletOutputStream sos = response.getOutputStream();
-            sos.write("Este es el mensaje original pasado a binario".getBytes());
+            SecretKeySpec secret = new SecretKeySpec(claveSesion, "AES");
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, secret);
+            AlgorithmParameters params = cipher.getParameters();
+            byte []ivBytes = params.getParameterSpec(IvParameterSpec.class).getIV();
+            System.out.println("IV length: " + ivBytes.length);
+            byte[] encryptedTextBytes = cipher.doFinal("Mensaje cifrado con AES".getBytes());
+            //sos.write("Este es el mensaje original pasado a binario".getBytes());
+            System.out.println("Respuesta enviada");
+            sos.write(ivBytes);
+            sos.write(encryptedTextBytes);
             sos.flush();
             sos.close();
-        }catch(IOException ioe){
+        }catch(Exception e){
+            e.printStackTrace();
         }
     }
     
