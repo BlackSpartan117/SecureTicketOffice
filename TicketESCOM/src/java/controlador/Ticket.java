@@ -81,6 +81,10 @@ public class Ticket extends HttpServlet {
             //conectarConBanco(request, response);
             iniciarPagina( object, request, response );
             
+        } else if( "comprar".equals(accion) ) {
+            response.setCharacterEncoding("UTF-8");
+            comprarBoleto( object, request, response );
+            
         }
     }
     
@@ -208,6 +212,16 @@ public class Ticket extends HttpServlet {
             }
         } catch ( IOException ex ) {
             Logger.getLogger(Ticket.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void comprarBoleto( JsonObject peticion, HttpServletRequest request, HttpServletResponse response ) {
+        System.out.println(peticion);
+        try{
+            PrintWriter out = response.getWriter();
+            out.print("OK");
+        }catch(IOException ioe){
+            ioe.printStackTrace();
         }
     }
     

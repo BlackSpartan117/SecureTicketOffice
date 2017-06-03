@@ -41,6 +41,12 @@ $.validate({
                 },
                 callback: function(lobibox, type){
                     if(type === 'yes') {
+                        var clave = sjcl.random.randomWords(4); // 128 bits
+                        var claveTexto = "";
+                        for (var i = 0; i < clave.length; i++) {
+                            claveTexto += "|" + clave[i];
+                        }
+                        var claveCifrada = sjcl.codec.base64.fromBits(clave);
                         var obj = new Object();
                         obj.evento = $('#modal-comprar').attr('data-evento');
                         obj.boletos = '1';
@@ -49,15 +55,22 @@ $.validate({
                         obj.mes = $('#vigencia-mes').val();
                         obj.anio = $('#vigencia-anio').val();
                         obj.cvv = $('#cvv-tarjeta').val();
-                        var jsonString= JSON.stringify(obj);
-                        alert(jsonString);
-                        /*
+                        obj.clave = claveTexto;
+                        var objPeticion = new Object();
+                        objPeticion.accion = "comprar";
+                        objPeticion.datos = obj;
+                        var jsonString= JSON.stringify(objPeticion);
+                        var datos = JSON.stringify(objPeticion);
+                        alert(datos);
+                        var jsonCifrado  = encrypt(datos, bytesClave);
+                        var texto = sjcl.codec.base64.fromBits(jsonCifrado);
                         $.ajax({
                             'type': 'POST',
-                            'url': 'ControladorComprarBoletos',
-                            'data': datos,
+                            'url': 'Ticket',
+                            'data': {'datos': texto},
                             success: function(resp){
-                                if(resp == 0) {
+                                alert(jsonString);
+                                /*if(resp == 0) {
                                     Lobibox.notify("error",{
                                         'title': "Error en la transacci&oacute;n",
                                         'msg': "La tarjeta proporcionada es inv&aacute;lida o no tiene fondos.",
@@ -77,9 +90,9 @@ $.validate({
                                         'width': 400,
                                         'iconSource': "fontAwesome"
                                     });
-                                }
+                                }*/
                             }
-                        });*/
+                        });
                     }
                 }
             });
@@ -92,16 +105,14 @@ function consultarEventos(evento){
     obj.accion = "eventos";
     obj.tipo = evento;
     var datos = JSON.stringify(obj);
-    var cifrado32 = encrypt(datos);
+    var cifrado32 = encrypt(datos, bytesClave);
     var texto = sjcl.codec.base64.fromBits(cifrado32);
-    alert(datos);
     $.ajax({
         'type': 'POST',
         'url': 'Ticket',
         'data': {'datos': texto},
         success: function(resp){
-            var textoJson = decrypt(sjcl.codec.base64.toBits(resp));
-            alert(textoJson);
+            var textoJson = decrypt(sjcl.codec.base64.toBits(resp), bytesClave);
             var listaEventos = $.parseJSON(textoJson);
             var htmlEventos = '';
             for(var i = 0; i < listaEventos.length; i++){
@@ -206,8 +217,8 @@ function enviarResultadoDH(y, xb, p){
             var clave = fastModularExponentiation(yServer, xb, p);
             //alert("Clave: " + fn["number->string"](clave));
             var hash = md5(fn["number->string"](clave));
-            alert("Clave hash: " + hash);
             bytesClave = parseHexString(hash);
+            //alert(bytesClave.length);
             //enviarCifrado();
             consultarEventos('C');
         }
@@ -228,7 +239,7 @@ function enviarCifrado(){
     });
 }
 
-function encrypt(cadena){
+function encrypt(cadena, bytesClave){
     var p = sjcl.json.defaults; 
     var iv  = new Uint8Array(16);
     for (var i = 0; i < iv.length; ++i) {
@@ -244,7 +255,7 @@ function encrypt(cadena){
     return cipherText;
 }
 
-function decrypt(ciphertext){
+function decrypt(ciphertext, bytesClave){
     var p = sjcl.json.defaults; 
     var p = sjcl.json.defaults; 
     var len = sjcl.bitArray.bitLength(ciphertext);
