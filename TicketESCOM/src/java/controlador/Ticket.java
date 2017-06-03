@@ -77,7 +77,7 @@ public class Ticket extends HttpServlet {
             //response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
                 /* funcion de prueba */ 
-            //conectarConBanco(request, response);
+            conectarConBanco(request, response);
             iniciarPagina( request, response );
             
         } else if( accion != null && accion.equals("parametros") ) {
