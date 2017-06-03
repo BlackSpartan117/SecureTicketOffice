@@ -10,6 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.ByteBuffer;
 import java.security.AlgorithmParameterGenerator;
 import java.security.AlgorithmParameters;
 import java.security.InvalidKeyException;
@@ -17,6 +18,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidParameterSpecException;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -91,8 +93,8 @@ public class Ticket extends HttpServlet {
              
         } else if (accion != null && accion.equals("resultadoDH")){
             claveDH(request, response);
-        } else if (accion != null && accion.equals("cifrar")){
-            cifrar(request, response);
+        } else if (accion != null && accion.equals("descifrar")){
+            descifrar(request, response);
         } else {
             response.getWriter().print("Error");
         }
@@ -153,22 +155,39 @@ public class Ticket extends HttpServlet {
         }
     }
     
-    private void cifrar(HttpServletRequest request, HttpServletResponse response){
+    private void descifrar(HttpServletRequest request, HttpServletResponse response){
         try{
-            ServletOutputStream sos = response.getOutputStream();
+            String datos = request.getParameter("datos");
+            byte[] decodedString = Base64.getDecoder().decode(datos.getBytes("UTF-8"));
+            
+            byte []ivBytes = Arrays.copyOfRange(decodedString, 0, 16);
+            byte []cipherText = Arrays.copyOfRange(decodedString, 16, decodedString.length);
             SecretKeySpec secret = new SecretKeySpec(claveSesion, "AES");
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, secret);
-            AlgorithmParameters params = cipher.getParameters();
-            byte []ivBytes = params.getParameterSpec(IvParameterSpec.class).getIV();
-            System.out.println("IV length: " + ivBytes.length);
-            byte[] encryptedTextBytes = cipher.doFinal("Mensaje cifrado con AES".getBytes());
-            //sos.write("Este es el mensaje original pasado a binario".getBytes());
-            System.out.println("Respuesta enviada");
-            sos.write(ivBytes);
-            sos.write(encryptedTextBytes);
-            sos.flush();
-            sos.close();
+            cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(ivBytes));
+            
+            byte[] decryptedTextBytes = null;
+            decryptedTextBytes = cipher.doFinal(cipherText);
+
+            System.out.println(new String(decryptedTextBytes));
+            try (PrintWriter out = response.getWriter()) {
+                /* Responder un mensaje cifrado. */
+                cipher.init(Cipher.ENCRYPT_MODE, secret);
+                AlgorithmParameters params = cipher.getParameters();
+                ivBytes = params.getParameterSpec(IvParameterSpec.class).getIV();
+                cipherText = cipher.doFinal("Respuesta del servidor cifrada con AES".getBytes());
+                ByteBuffer buffer = ByteBuffer.allocate(1024 * 4);
+                buffer.put(ivBytes);
+                buffer.put(cipherText);
+                int tam = buffer.position();
+                byte []respuesta = new byte[tam];
+                buffer.flip();
+                buffer.get(respuesta);
+                byte []respuestaBase64 = Base64.getEncoder().encode(respuesta);
+                String resp = new String(respuestaBase64);
+                System.out.println(resp);
+                out.print(resp);
+            }
         }catch(Exception e){
             e.printStackTrace();
         }

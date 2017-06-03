@@ -199,30 +199,23 @@ function enviarResultadoDH(y, xb, p){
             var hash = md5(fn["number->string"](clave));
             alert("Clave hash: " + hash);
             bytesClave = parseHexString(hash);
-            //encrypt("Mensaje secreto enviado por aes");
-            cifrar();
+            enviarCifrado();
         }
     });
 }
 
-function cifrar(){
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'Ticket', true);
-    //xhr.responseType = 'blob';
-    xhr.responseType = 'arraybuffer';
-    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    xhr.onload = function(e) {
-      if (this.status == 200) {
-        // get binary data as a response
-        //var blob = this.response;
-        var responseArray = new Uint8Array(this.response);
-        decrypt(responseArray);
-        //var texto = sjcl.codec.bytes.toBits(responseArray);
-        //alert(sjcl.codec.utf8String.fromBits(texto));
-      }
-    };
-
-    xhr.send('accion=cifrar');
+function enviarCifrado(){
+    var cifrado32 = encrypt("Mensaje secreto enviado por aes");
+    var texto = sjcl.codec.base64.fromBits(cifrado32);
+    $.ajax({
+        'type': 'POST',
+        'url': 'Ticket',
+        'data': {'accion' : 'descifrar', 'datos' : texto},
+        success: function(resp){
+            alert(resp);
+            decrypt(sjcl.codec.base64.toBits(resp));
+        }
+    });
 }
 
 function encrypt(cadena){
@@ -237,30 +230,21 @@ function encrypt(cadena){
     var aes = new sjcl.cipher.aes(bytesClave);
     sjcl.beware["CBC mode is dangerous because it doesn't protect message integrity."]();
     var encrypted = sjcl.mode[p.mode].encrypt(aes, sjcl.codec.utf8String.toBits(cadena), p.iv);
-    decrypt(encrypted);
+    var cipherText = sjcl.bitArray.concat(p.iv, encrypted);
+    return cipherText;
 }
 
-function decrypt(cifrado){
+function decrypt(ciphertext){
     var p = sjcl.json.defaults; 
-    var iv  = new Uint8Array(16);
-    for (var i = 0; i < iv.length; i++) {
-        iv[i] = cifrado[i];
-    }
-    var ciphertext  = new Uint8Array(cifrado.length - iv.length);
-    for (var i = 0; i < ciphertext.length; i++) {
-        ciphertext[i] = cifrado[i + iv.length];
-    }
-    /*var iv  = new Uint8Array(16);
-    for (var i = 0; i < iv.length; ++i) {
-        iv[i] = 0;
-    }*/
-    p.iv = sjcl.codec.bytes.toBits(iv);
-    var texto = sjcl.codec.bytes.toBits(ciphertext);
+    var p = sjcl.json.defaults; 
+    var len = sjcl.bitArray.bitLength(ciphertext);
+    var iv = sjcl.bitArray.bitSlice(ciphertext, 0, 128);
+    p.iv = iv;
     p.salt = [];
     p.mode = "cbc";
     var aes = new sjcl.cipher.aes(bytesClave);
     sjcl.beware["CBC mode is dangerous because it doesn't protect message integrity."]();
-    var decrypted = sjcl.mode[p.mode].decrypt(aes, texto, p.iv);
+    var decrypted = sjcl.mode[p.mode].decrypt(aes, sjcl.bitArray.bitSlice(ciphertext, 128, len), p.iv);
     alert(sjcl.codec.utf8String.fromBits(decrypted));
 }
 
@@ -276,4 +260,4 @@ function parseHexString(str) {
 }
 
 handShake();
-consultarEventos('C');
+//consultarEventos('C');

@@ -16,7 +16,6 @@
         <filter-name>LoginFilter</filter-name>
         <url-pattern>/registro.html</url-pattern>
     </filter-mapping>
-    
     <servlet>
         <servlet-name>Ticket</servlet-name>
         <servlet-class>controlador.Ticket</servlet-class>
@@ -29,6 +28,10 @@
         <servlet-name>Login</servlet-name>
         <servlet-class>controlador.Login</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>PruebaDatosBinarios</servlet-name>
+        <servlet-class>controlador.PruebaDatosBinarios</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Ticket</servlet-name>
         <url-pattern>/Ticket</url-pattern>
@@ -40,6 +43,10 @@
     <servlet-mapping>
         <servlet-name>Login</servlet-name>
         <url-pattern>/Login</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PruebaDatosBinarios</servlet-name>
+        <url-pattern>/PruebaDatosBinarios</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
