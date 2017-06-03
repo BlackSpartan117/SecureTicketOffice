@@ -12,7 +12,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
-import java.security.AlgorithmParameterGenerator;
 import java.security.AlgorithmParameters;
 import java.util.Arrays;
 import java.util.Base64;
@@ -31,7 +30,6 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -83,12 +81,12 @@ public class Ticket extends HttpServlet {
             
         } else if( "comprar".equals(accion) ) {
             response.setCharacterEncoding("UTF-8");
-            comprarBoleto( object, request, response );
+            comprarBoleto( object, response );
             
         }
     }
     
-    private String descifrar(HttpServletRequest request, byte []clave, String datosBase64){
+    private String descifrar(byte []clave, String datosBase64){
         try{
             byte[] decodedString = Base64.getDecoder().decode(datosBase64.getBytes("UTF-8"));
             
@@ -111,7 +109,7 @@ public class Ticket extends HttpServlet {
     
     private String descifrar(HttpServletRequest request, byte []clave){
         String datos = request.getParameter("datos");
-        return descifrar(request, clave, datos);
+        return descifrar(clave, datos);
     }
     
     private String descifrar(HttpServletRequest request){
@@ -120,7 +118,7 @@ public class Ticket extends HttpServlet {
         return descifrar(request, claveSesion);
     }
     
-    private String cifrar(HttpServletRequest request, HttpServletResponse response, String datos, byte []clave){
+    private String cifrar(String datos, byte []clave){
         try{
             SecretKeySpec secret = new SecretKeySpec(clave, "AES");
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -145,10 +143,10 @@ public class Ticket extends HttpServlet {
         }
     }
     
-    private String cifrar(HttpServletRequest request, HttpServletResponse response, String datos){
+    private String cifrar(HttpServletRequest request, String datos){
         HttpSession sesion= (HttpSession)request.getSession();
         byte []claveSesion = (byte [])sesion.getAttribute("clave");
-        return cifrar(request, response, datos, claveSesion);
+        return cifrar(datos, claveSesion);
     }
     
 /* Ejemplo extraido de http://www.theserverside.com/news/thread.tss?thread_id=21884
@@ -213,7 +211,7 @@ public class Ticket extends HttpServlet {
                 System.out.println("SIZE event " + eventos.size() );
                 String json = crearJSON( eventos ).toString();
                 System.out.println(json);
-                String respuesta = this.cifrar(request, response, json);
+                String respuesta = this.cifrar(request, json);
                 response.getWriter().print(respuesta);
                 
             } else {
@@ -224,7 +222,7 @@ public class Ticket extends HttpServlet {
         }
     }
     
-    private void comprarBoleto( JsonObject peticion, HttpServletRequest request, HttpServletResponse response ) {
+    private void comprarBoleto( JsonObject peticion, HttpServletResponse response ) {
         JsonObject obj      = peticion.getJsonObject("datos");
         String claveBase64  = obj.getString("clave");
         JsonObject evento   = obj.getJsonObject("evento");
@@ -240,7 +238,7 @@ public class Ticket extends HttpServlet {
             Aqui puede realizarse porque aun falta el cifrado RSA de la clave temporal
             */
             byte[] claveTemporal = Base64.getDecoder().decode(claveBase64.getBytes("UTF-8"));
-            String jsonTarjeta  = descifrar(request, claveTemporal, tarjeta);
+            String jsonTarjeta  = descifrar(claveTemporal, tarjeta);
             System.out.println("Tarjeta descifrada: " + jsonTarjeta);
             PrintWriter out = response.getWriter();
             out.print("OK");
