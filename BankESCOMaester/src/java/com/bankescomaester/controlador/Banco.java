@@ -42,6 +42,7 @@ public class Banco extends HttpServlet {
         rutaImgIPN = config.getServletContext().getRealPath("/images/ipn.png");
         imgESCOM = config.getServletContext().getRealPath("/images/escom.png");
         System.out.println("la ruta es: " + ruta);
+        System.out.println("la ruta es: " + pdfs);
     }
     
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -78,6 +79,9 @@ public class Banco extends HttpServlet {
         boolean transaccionCorrecta = false;
         Cuenta cuentaUsuario;
         BankDAO dao = new BankDAO();
+        
+        if( cuentasXML == null )
+            return transaccionCorrecta;
         
         for( Cuenta datosPeticion : cuentasXML ) {
             if( datosPeticion.getSaldo() > 1 ) { /* No es la cuenta de TicketsESCOM */
