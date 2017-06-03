@@ -244,9 +244,11 @@ public class Ticket extends HttpServlet {
             System.out.println("Tarjeta descifrada: " + jsonTarjeta);
             PrintWriter out = response.getWriter();
             out.print("OK");
+            /*
             String xml= new xmlcuenta().crearXML() ;
             String cuenta = this.cifrar(request, response, xml);
             conectarConBanco(request, response);
+            */
             //System.out.println(cuenta);
         }catch(Exception ioe){
             ioe.printStackTrace();
