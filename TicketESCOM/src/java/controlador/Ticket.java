@@ -5,6 +5,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -13,35 +14,28 @@ import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.security.AlgorithmParameterGenerator;
 import java.security.AlgorithmParameters;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidParameterSpecException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.DHParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
+import javax.json.JsonReader;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import negocio.ConexionMySQL;
 import negocio.DAO;
 import negocio.PropiedadConexion;
@@ -59,7 +53,6 @@ public class Ticket extends HttpServlet {
     private DAO consulta;
     private BigInteger primoDH;
     private BigInteger generadorDH;
-    private byte []claveSesion;
     
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -74,94 +67,34 @@ public class Ticket extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        String opcion = request.getParameter("iniciar");
-        String accion = request.getParameter("accion");
-        System.out.println( "OPCION  " + opcion );
+        String peticion = this.descifrar(request, response);
+        JsonReader jsonReader = Json.createReader(new StringReader(peticion));
+        JsonObject object = jsonReader.readObject();
+        jsonReader.close();
+        
+        String accion = object.getString("accion");
         System.out.println( "ACCION  " + accion );
         
-        request.setCharacterEncoding("UTF-8");
-        if( opcion != null && opcion.equals("iniciaPagina") ) {
-            System.out.println("\n\n\n\nOK\n\n\n");
-            //response.setContentType("application/json");
+        if( "eventos".equals(accion) ) {
             response.setCharacterEncoding("UTF-8");
                 /* funcion de prueba */ 
-            conectarConBanco(request, response);
-            iniciarPagina( request, response );
-            
-        } else if( accion != null && accion.equals("parametros") ) {
-             DiffieHellman( request,response );
-             
-        } else if (accion != null && accion.equals("resultadoDH")){
-            claveDH(request, response);
-        } else if (accion != null && accion.equals("descifrar")){
-            descifrar(request, response);
-        } else {
-            response.getWriter().print("Error");
-        }
-    }
-    
-    private void DiffieHellman( HttpServletRequest reques, HttpServletResponse response ) {
-        try {
-            AlgorithmParameterGenerator paramGen = AlgorithmParameterGenerator.getInstance("DH");
-            paramGen.init(512);
-
-            AlgorithmParameters params = paramGen.generateParameters();
-            DHParameterSpec dhSpec;
-            dhSpec = (DHParameterSpec) params.getParameterSpec(DHParameterSpec.class);
-
-            System.out.println("" + dhSpec.getP() + "\n" + dhSpec.getG() + "\n" + dhSpec.getL());
-
-            JsonObjectBuilder respuesta = Json.createObjectBuilder();
-            
-            primoDH = dhSpec.getP();
-            generadorDH = dhSpec.getG();
-            
-            respuesta.add("primo", primoDH);
-            respuesta.add("generador", generadorDH);
-            respuesta.add("longitud",dhSpec.getL());
-            
-            JsonObject o = respuesta.build();
-
-            PrintWriter out = response.getWriter();
-            System.out.println(o);
-            out.print(o);
-    
-        } catch (InvalidParameterSpecException | IOException | NoSuchAlgorithmException ex) {
+            //conectarConBanco(request, response);
+            iniciarPagina( object, request, response );
             
         }
     }
     
-    private void claveDH(HttpServletRequest request, HttpServletResponse response){
-        try{
-            String resultadoCliente = request.getParameter("resultado");
-            BigInteger res = new BigInteger(resultadoCliente);
-            BigInteger xa = randomBigInteger(primoDH);
-            BigInteger y = modulo(generadorDH, xa, primoDH);
-            try{
-               response.getWriter().print(y.toString());
-            }catch(IOException ioe){
-                ioe.printStackTrace();
-            }
-            BigInteger clave = modulo(res, xa, primoDH);
-            MessageDigest md;
-            md = MessageDigest.getInstance("MD5");
-            claveSesion = md.digest(clave.toString().getBytes());
-            String hexClave = bytesToHex(claveSesion);
-            System.out.println("Clave acordada: " + hexClave);
-            
-            //System.out.println("Clave acordada: " + claveSesion.toString());
-        }catch(NoSuchAlgorithmException nsae){
-            nsae.printStackTrace();
-        }
-    }
-    
-    private void descifrar(HttpServletRequest request, HttpServletResponse response){
+    private String descifrar(HttpServletRequest request, HttpServletResponse response){
         try{
             String datos = request.getParameter("datos");
             byte[] decodedString = Base64.getDecoder().decode(datos.getBytes("UTF-8"));
             
             byte []ivBytes = Arrays.copyOfRange(decodedString, 0, 16);
             byte []cipherText = Arrays.copyOfRange(decodedString, 16, decodedString.length);
+            
+            HttpSession sesion= (HttpSession)request.getSession();
+            byte []claveSesion = (byte [])sesion.getAttribute("clave");
+            
             SecretKeySpec secret = new SecretKeySpec(claveSesion, "AES");
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(ivBytes));
@@ -169,27 +102,39 @@ public class Ticket extends HttpServlet {
             byte[] decryptedTextBytes = null;
             decryptedTextBytes = cipher.doFinal(cipherText);
 
-            System.out.println(new String(decryptedTextBytes));
-            try (PrintWriter out = response.getWriter()) {
-                /* Responder un mensaje cifrado. */
-                cipher.init(Cipher.ENCRYPT_MODE, secret);
-                AlgorithmParameters params = cipher.getParameters();
-                ivBytes = params.getParameterSpec(IvParameterSpec.class).getIV();
-                cipherText = cipher.doFinal("Respuesta del servidor cifrada con AES".getBytes());
-                ByteBuffer buffer = ByteBuffer.allocate(1024 * 4);
-                buffer.put(ivBytes);
-                buffer.put(cipherText);
-                int tam = buffer.position();
-                byte []respuesta = new byte[tam];
-                buffer.flip();
-                buffer.get(respuesta);
-                byte []respuestaBase64 = Base64.getEncoder().encode(respuesta);
-                String resp = new String(respuestaBase64);
-                System.out.println(resp);
-                out.print(resp);
-            }
+            return new String(decryptedTextBytes);
         }catch(Exception e){
             e.printStackTrace();
+            return null;
+        }
+    }
+    
+    private String cifrar(HttpServletRequest request, HttpServletResponse response, String datos){
+        try{
+            
+            HttpSession sesion= (HttpSession)request.getSession();
+            byte []claveSesion = (byte [])sesion.getAttribute("clave");
+            
+            SecretKeySpec secret = new SecretKeySpec(claveSesion, "AES");
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, secret);
+            AlgorithmParameters params = cipher.getParameters();
+            byte []ivBytes = params.getParameterSpec(IvParameterSpec.class).getIV();
+            byte []cipherText = cipher.doFinal(datos.getBytes());
+            ByteBuffer buffer = ByteBuffer.allocate(1024 * 128);
+            buffer.put(ivBytes);
+            buffer.put(cipherText);
+            int tam = buffer.position();
+            byte []respuesta = new byte[tam];
+            buffer.flip();
+            buffer.get(respuesta);
+            byte []respuestaBase64 = Base64.getEncoder().encode(respuesta);
+            String resp = new String(respuestaBase64);
+            System.out.println(resp);
+            return resp;
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
         }
     }
     
@@ -239,9 +184,9 @@ public class Ticket extends HttpServlet {
         
     }
     
-    private void iniciarPagina( HttpServletRequest request, HttpServletResponse response ) {
+    private void iniciarPagina( JsonObject peticion, HttpServletRequest request, HttpServletResponse response ) {
         LinkedList<Evento> eventos;
-        String tipo = request.getParameter("tipo");
+        String tipo = peticion.getString("tipo");
         String tipoEvento = "";
         switch(tipo){
             case "C": tipoEvento = "Cine"; break;
@@ -253,7 +198,10 @@ public class Ticket extends HttpServlet {
             
             if( eventos != null ) {
                 System.out.println("SIZE event " + eventos.size() );
-                response.getWriter().print( crearJSON( eventos ) );
+                String json = crearJSON( eventos ).toString();
+                System.out.println(json);
+                String respuesta = this.cifrar(request, response, json);
+                response.getWriter().print(respuesta);
                 
             } else {
                 response.getWriter().print( Json.createObjectBuilder().add( "Error", "error").build() );
@@ -301,44 +249,5 @@ public class Ticket extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-    
-    private BigInteger modulo( BigInteger a, BigInteger b, BigInteger c ) {
-        BigInteger x = new BigInteger("1");
-        BigInteger y = a;
-        BigInteger zero = new BigInteger("0");
-        BigInteger dos = new BigInteger("2");
-
-        while( b.compareTo( zero ) == 1 ) {
-            if( b.mod( dos ).compareTo( new BigInteger("1") ) == 0 ) {
-                x = ( x.multiply( y ) ).mod( c );
-            }
-
-            y = ( y.multiply( y ) ).mod( c ); // squaring the base
-            b = b.divide( dos );
-        }
-
-        return x.mod( c );
-    }
-    
-    private BigInteger randomBigInteger(BigInteger n) {
-        Random rnd = new Random();
-        int maxNumBitLength = n.bitLength();
-        BigInteger aRandomBigInt;
-        do {
-            aRandomBigInt = new BigInteger(maxNumBitLength, rnd);
-        } while (aRandomBigInt.compareTo(n.subtract(new BigInteger("2"))) > 0 || aRandomBigInt.compareTo(new BigInteger("2")) < 0); 
-        return aRandomBigInt;
-    }
-    
-    private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
-    public static String bytesToHex(byte[] bytes) {
-        char[] hexChars = new char[bytes.length * 2];
-        for ( int j = 0; j < bytes.length; j++ ) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = hexArray[v >>> 4];
-            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-        }
-        return new String(hexChars);
-    }
 
 }

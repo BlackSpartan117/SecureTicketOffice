@@ -29,8 +29,8 @@
         <servlet-class>controlador.Login</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>PruebaDatosBinarios</servlet-name>
-        <servlet-class>controlador.PruebaDatosBinarios</servlet-class>
+        <servlet-name>Handshake</servlet-name>
+        <servlet-class>controlador.Handshake</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>Ticket</servlet-name>
@@ -45,8 +45,8 @@
         <url-pattern>/Login</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>PruebaDatosBinarios</servlet-name>
-        <url-pattern>/PruebaDatosBinarios</url-pattern>
+        <servlet-name>Handshake</servlet-name>
+        <url-pattern>/Handshake</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

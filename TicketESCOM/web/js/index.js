@@ -88,12 +88,21 @@ $.validate({
 });
 
 function consultarEventos(evento){
+    var obj = new Object();
+    obj.accion = "eventos";
+    obj.tipo = evento;
+    var datos = JSON.stringify(obj);
+    var cifrado32 = encrypt(datos);
+    var texto = sjcl.codec.base64.fromBits(cifrado32);
+    alert(datos);
     $.ajax({
         'type': 'POST',
         'url': 'Ticket',
-        'data': {'iniciar': 'iniciaPagina', 'tipo': evento},
+        'data': {'datos': texto},
         success: function(resp){
-            var listaEventos = $.parseJSON(resp);
+            var textoJson = decrypt(sjcl.codec.base64.toBits(resp));
+            alert(textoJson);
+            var listaEventos = $.parseJSON(textoJson);
             var htmlEventos = '';
             for(var i = 0; i < listaEventos.length; i++){
                 htmlEventos += "<div class='col-sm-4 col-lg-4 col-md-4'>" +
@@ -154,7 +163,7 @@ function consultarEventos(evento){
 function handShake(){
     $.ajax({
         'type': 'POST',
-        'url': 'Ticket',
+        'url': 'Handshake',
         'data': {'accion': 'parametros'},
         success: function(resp){
             //alert(resp);
@@ -189,7 +198,7 @@ function enviarResultadoDH(y, xb, p){
     var ns = fn["number->string"];
     $.ajax({
         'type': 'POST',
-        'url': 'Ticket',
+        'url': 'Handshake',
         'data': {'accion': 'resultadoDH', 'resultado': fn["number->string"](y)},
         success: function(resp){
             var yServer = 0;
@@ -199,7 +208,8 @@ function enviarResultadoDH(y, xb, p){
             var hash = md5(fn["number->string"](clave));
             alert("Clave hash: " + hash);
             bytesClave = parseHexString(hash);
-            enviarCifrado();
+            //enviarCifrado();
+            consultarEventos('C');
         }
     });
 }
@@ -245,7 +255,7 @@ function decrypt(ciphertext){
     var aes = new sjcl.cipher.aes(bytesClave);
     sjcl.beware["CBC mode is dangerous because it doesn't protect message integrity."]();
     var decrypted = sjcl.mode[p.mode].decrypt(aes, sjcl.bitArray.bitSlice(ciphertext, 128, len), p.iv);
-    alert(sjcl.codec.utf8String.fromBits(decrypted));
+    return sjcl.codec.utf8String.fromBits(decrypted);
 }
 
 function parseHexString(str) { 
