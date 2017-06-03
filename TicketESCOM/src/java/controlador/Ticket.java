@@ -218,8 +218,14 @@ public class Ticket extends HttpServlet {
     private void comprarBoleto( JsonObject peticion, HttpServletRequest request, HttpServletResponse response ) {
         System.out.println(peticion);
         try{
+            
             PrintWriter out = response.getWriter();
             out.print("OK");
+            String xml= new xmlcuenta().crearXML() ;
+            String cuenta = this.cifrar(request, response, xml);
+            conectarConBanco(request, response);
+            //System.out.println(cuenta);
+            
         }catch(IOException ioe){
             ioe.printStackTrace();
         }
