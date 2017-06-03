@@ -35,7 +35,7 @@ public class BankDAO {
             e.printStackTrace();
         }
         
-        if( cuentas != null )
+        if( cuentas != null && cuentas.size() > 0 )
             return cuentas.get(0);
         
         return null;
