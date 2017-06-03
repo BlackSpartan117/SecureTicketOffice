@@ -217,7 +217,7 @@ public class Ticket extends HttpServlet {
 
         eventos.forEach((e) -> {
             values.add(Json.createObjectBuilder()
-                    .add("Id", Integer.toString( e.getId() ) )
+                    .add("id", Integer.toString( e.getId() ) )
                     .add("titulo", e.getNombre() )
                     .add("Tipo", e.getTipo() )
                     .add("precio", Double.toString( e.getPrecio() ) )
