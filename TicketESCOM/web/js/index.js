@@ -42,11 +42,6 @@ $.validate({
                 callback: function(lobibox, type){
                     if(type === 'yes') {
                         var clave = sjcl.random.randomWords(4); // 128 bits
-                        var claveTexto = "";
-                        for (var i = 0; i < clave.length; i++) {
-                            claveTexto += "|" + clave[i];
-                        }
-                        var claveCifrada = sjcl.codec.base64.fromBits(clave);
                         var objEvento   = new Object();
                         var objTarjeta  = new Object();
                         var objPeticion = new Object();
@@ -60,13 +55,17 @@ $.validate({
                         objTarjeta.anio    = $('#vigencia-anio').val();
                         objTarjeta.cvv     = $('#cvv-tarjeta').val();
                         
-                        obj.clave   = claveTexto;
+                        var datos = JSON.stringify(objTarjeta);
+                        var jsonCifrado  = encrypt(datos, clave);
+                        var textoTarjeta = sjcl.codec.base64.fromBits(jsonCifrado);
+                        var textoClave = sjcl.codec.base64.fromBits(clave);
+                        
+                        obj.clave   = textoClave;
                         obj.evento  = objEvento;
-                        obj.tarjeta = objTarjeta;
+                        obj.tarjeta = textoTarjeta;
                         
                         objPeticion.accion = "comprar";
                         objPeticion.datos = obj;
-                        var jsonString= JSON.stringify(objPeticion);
                         var datos = JSON.stringify(objPeticion);
                         var jsonCifrado  = encrypt(datos, bytesClave);
                         var texto = sjcl.codec.base64.fromBits(jsonCifrado);
@@ -75,8 +74,7 @@ $.validate({
                             'url': 'Ticket',
                             'data': {'datos': texto},
                             success: function(resp){
-                                alert(datos);
-                                /*if(resp == 0) {
+                                if(resp != "OK") {
                                     Lobibox.notify("error",{
                                         'title': "Error en la transacci&oacute;n",
                                         'msg': "La tarjeta proporcionada es inv&aacute;lida o no tiene fondos.",
@@ -96,7 +94,7 @@ $.validate({
                                         'width': 400,
                                         'iconSource': "fontAwesome"
                                     });
-                                }*/
+                                }
                             }
                         });
                     }
@@ -221,11 +219,8 @@ function enviarResultadoDH(y, xb, p){
             var yServer = 0;
             yServer = resp;
             var clave = fastModularExponentiation(yServer, xb, p);
-            //alert("Clave: " + fn["number->string"](clave));
             var hash = md5(fn["number->string"](clave));
             bytesClave = parseHexString(hash);
-            //alert(bytesClave.length);
-            //enviarCifrado();
             consultarEventos('C');
         }
     });
@@ -287,4 +282,3 @@ function parseHexString(str) {
 }
 
 handShake();
-//consultarEventos('C');

@@ -67,7 +67,7 @@ public class Ticket extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        String peticion = this.descifrar(request, response);
+        String peticion = this.descifrar(request);
         JsonReader jsonReader = Json.createReader(new StringReader(peticion));
         JsonObject object = jsonReader.readObject();
         jsonReader.close();
@@ -88,18 +88,14 @@ public class Ticket extends HttpServlet {
         }
     }
     
-    private String descifrar(HttpServletRequest request, HttpServletResponse response){
+    private String descifrar(HttpServletRequest request, byte []clave, String datosBase64){
         try{
-            String datos = request.getParameter("datos");
-            byte[] decodedString = Base64.getDecoder().decode(datos.getBytes("UTF-8"));
+            byte[] decodedString = Base64.getDecoder().decode(datosBase64.getBytes("UTF-8"));
             
             byte []ivBytes = Arrays.copyOfRange(decodedString, 0, 16);
             byte []cipherText = Arrays.copyOfRange(decodedString, 16, decodedString.length);
             
-            HttpSession sesion= (HttpSession)request.getSession();
-            byte []claveSesion = (byte [])sesion.getAttribute("clave");
-            
-            SecretKeySpec secret = new SecretKeySpec(claveSesion, "AES");
+            SecretKeySpec secret = new SecretKeySpec(clave, "AES");
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(ivBytes));
             
@@ -113,13 +109,20 @@ public class Ticket extends HttpServlet {
         }
     }
     
-    private String cifrar(HttpServletRequest request, HttpServletResponse response, String datos){
+    private String descifrar(HttpServletRequest request, byte []clave){
+        String datos = request.getParameter("datos");
+        return descifrar(request, clave, datos);
+    }
+    
+    private String descifrar(HttpServletRequest request){
+        HttpSession sesion= (HttpSession)request.getSession();
+        byte []claveSesion = (byte [])sesion.getAttribute("clave");
+        return descifrar(request, claveSesion);
+    }
+    
+    private String cifrar(HttpServletRequest request, HttpServletResponse response, String datos, byte []clave){
         try{
-            
-            HttpSession sesion= (HttpSession)request.getSession();
-            byte []claveSesion = (byte [])sesion.getAttribute("clave");
-            
-            SecretKeySpec secret = new SecretKeySpec(claveSesion, "AES");
+            SecretKeySpec secret = new SecretKeySpec(clave, "AES");
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, secret);
             AlgorithmParameters params = cipher.getParameters();
@@ -140,6 +143,12 @@ public class Ticket extends HttpServlet {
             e.printStackTrace();
             return null;
         }
+    }
+    
+    private String cifrar(HttpServletRequest request, HttpServletResponse response, String datos){
+        HttpSession sesion= (HttpSession)request.getSession();
+        byte []claveSesion = (byte [])sesion.getAttribute("clave");
+        return cifrar(request, response, datos, claveSesion);
     }
     
 /* Ejemplo extraido de http://www.theserverside.com/news/thread.tss?thread_id=21884
@@ -216,11 +225,26 @@ public class Ticket extends HttpServlet {
     }
     
     private void comprarBoleto( JsonObject peticion, HttpServletRequest request, HttpServletResponse response ) {
-        System.out.println(peticion);
+        JsonObject obj      = peticion.getJsonObject("datos");
+        String claveBase64  = obj.getString("clave");
+        JsonObject evento   = obj.getJsonObject("evento");
+        String tarjeta      = obj.getString("tarjeta");
+        
+        System.out.println("Clave: " + claveBase64);
+        System.out.println("Evento: " + evento);
+        System.out.println("Tarjeta: " + tarjeta);
+       
         try{
+            /* Este bloque para verificar que el cifrado AES sobre la tarejta
+            funciones correctamente. Este descifrado lo debe hacer el banco.
+            Aqui puede realizarse porque aun falta el cifrado RSA de la clave temporal
+            */
+            byte[] claveTemporal = Base64.getDecoder().decode(claveBase64.getBytes("UTF-8"));
+            String jsonTarjeta  = descifrar(request, claveTemporal, tarjeta);
+            System.out.println("Tarjeta descifrada: " + jsonTarjeta);
             PrintWriter out = response.getWriter();
             out.print("OK");
-        }catch(IOException ioe){
+        }catch(Exception ioe){
             ioe.printStackTrace();
         }
     }
