@@ -47,21 +47,27 @@ $.validate({
                             claveTexto += "|" + clave[i];
                         }
                         var claveCifrada = sjcl.codec.base64.fromBits(clave);
-                        var obj = new Object();
-                        obj.evento = $('#modal-comprar').attr('data-evento');
-                        obj.boletos = '1';
-                        obj.tarjeta  = $('#numero-tarjeta').val();
-                        obj.titular = $('#titular-tarjeta').val();
-                        obj.mes = $('#vigencia-mes').val();
-                        obj.anio = $('#vigencia-anio').val();
-                        obj.cvv = $('#cvv-tarjeta').val();
-                        obj.clave = claveTexto;
+                        var objEvento   = new Object();
+                        var objTarjeta  = new Object();
                         var objPeticion = new Object();
+                        var obj         = new Object();
+                        objEvento.evento   = $('#modal-comprar').attr('data-evento');
+                        objEvento.boletos  = '1';
+                        
+                        objTarjeta.tarjeta = $('#numero-tarjeta').val();
+                        objTarjeta.titular = $('#titular-tarjeta').val();
+                        objTarjeta.mes     = $('#vigencia-mes').val();
+                        objTarjeta.anio    = $('#vigencia-anio').val();
+                        objTarjeta.cvv     = $('#cvv-tarjeta').val();
+                        
+                        obj.clave   = claveTexto;
+                        obj.evento  = objEvento;
+                        obj.tarjeta = objTarjeta;
+                        
                         objPeticion.accion = "comprar";
                         objPeticion.datos = obj;
                         var jsonString= JSON.stringify(objPeticion);
                         var datos = JSON.stringify(objPeticion);
-                        alert(datos);
                         var jsonCifrado  = encrypt(datos, bytesClave);
                         var texto = sjcl.codec.base64.fromBits(jsonCifrado);
                         $.ajax({
@@ -69,7 +75,7 @@ $.validate({
                             'url': 'Ticket',
                             'data': {'datos': texto},
                             success: function(resp){
-                                alert(jsonString);
+                                alert(datos);
                                 /*if(resp == 0) {
                                     Lobibox.notify("error",{
                                         'title': "Error en la transacci&oacute;n",
