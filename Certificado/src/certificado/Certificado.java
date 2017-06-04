@@ -78,12 +78,12 @@ public class Certificado {
             CifradorRSA cifrador = new CifradorRSA();
             md = MessageDigest.getInstance("SHA-256");
             byte[] mdbytes = md.digest(bytesCertificado);
-            byte []bytesFirma = cifrador.encrypt(mdbytes, llave);
+            this.firma = cifrador.encrypt(mdbytes, llave);
             File cer = new File(System.getProperty("user.dir") + "/src/certificados/" + this.id + ".cer");
             FileOutputStream fos = new FileOutputStream(cer);
             fos.write(bytesCertificado);
-            fos.write(bytesFirma);
-            System.out.println(bytesFirma.length);
+            fos.write(this.firma);
+            System.out.println(this.firma.length);
             fos.close();
         } catch (NoSuchAlgorithmException | IOException ex) {
             ex.printStackTrace();
@@ -173,5 +173,8 @@ public class Certificado {
     }
     public PublicKey getLlave(){
         return this.llave;
+    }
+    public byte[] getFirma(){
+        return this.firma;
     }
 }

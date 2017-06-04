@@ -19,7 +19,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import org.apache.commons.codec.binary.Base64;
+/*import org.apache.commons.codec.binary.Base64;*/
  
 public class AESDemo {
  
@@ -53,14 +53,14 @@ public class AESDemo {
         AlgorithmParameters params = cipher.getParameters();
         ivBytes = params.getParameterSpec(IvParameterSpec.class).getIV();
         byte[] encryptedTextBytes = cipher.doFinal(plainText.getBytes("UTF-8"));
-        return new Base64().encodeAsString(encryptedTextBytes);
+        return null;//return new Base64().encodeAsString(encryptedTextBytes);
     }
  
     @SuppressWarnings("static-access")
     public String decrypt(String encryptedText) throws Exception {
  
         byte[] saltBytes = salt.getBytes("UTF-8");
-        byte[] encryptedTextBytes = new Base64().decodeBase64(encryptedText);
+        byte[] encryptedTextBytes = null;//new Base64().decodeBase64(encryptedText);
  
         // Derive the key
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
