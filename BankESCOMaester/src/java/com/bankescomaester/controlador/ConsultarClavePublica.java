@@ -34,24 +34,42 @@ public class ConsultarClavePublica extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String accion = request.getParameter("accion");
+        if("publicKey".equals(accion)){
+            devolverClavePublica(request, response);
+        }else if("descifrar".equals(accion)){
+            descifrarBase64(request, response);
+        }
+    }
+    
+    private void devolverClavePublica(HttpServletRequest request, HttpServletResponse response){
         CifradorRSA cifrador = new CifradorRSA(this);
         /* Leer llaves del banco*/
         PrivateKey clavePrivadaBanco = (PrivateKey) cifrador.leerLlave("private.key", CifradorRSA.TipoLlave.PRIVADA);
         PublicKey clavePublicaBanco = (PublicKey) cifrador.leerLlave("public.key", CifradorRSA.TipoLlave.PUBLICA);
-        if("publicKey".equals(accion)){
-            byte []clavePublicaBase64 = Base64.getEncoder().encode(clavePublicaBanco.getEncoded());
-            String clavePublica = new String(clavePublicaBase64);
-            try (PrintWriter out = response.getWriter()) {
-                out.print(clavePublica);
-            }
-        }else if("descifrar".equals(accion)){
-            String textoCifradoBase64 = request.getParameter("datos");
-            String respuesta = cifrador.decrypt(textoCifradoBase64, clavePrivadaBanco);
-            System.out.println(respuesta);
-            try (PrintWriter out = response.getWriter()) {
-                /* TODO output your page here. You may use following sample code. */
-                out.print(respuesta);
-            }
+        
+        byte []clavePublicaBase64 = Base64.getEncoder().encode(clavePublicaBanco.getEncoded());
+        String clavePublica = new String(clavePublicaBase64);
+        try (PrintWriter out = response.getWriter()) {
+            out.print(clavePublica);
+        }catch(IOException ioe){
+            ioe.printStackTrace();
+        }
+    }
+    
+    private void descifrarBase64(HttpServletRequest request, HttpServletResponse response){
+        CifradorRSA cifrador = new CifradorRSA(this);
+        /* Leer llaves del banco*/
+        PrivateKey clavePrivadaBanco = (PrivateKey) cifrador.leerLlave("private.key", CifradorRSA.TipoLlave.PRIVADA);
+        PublicKey clavePublicaBanco = (PublicKey) cifrador.leerLlave("public.key", CifradorRSA.TipoLlave.PUBLICA);
+        
+        String textoCifradoBase64 = request.getParameter("datos");
+        String respuesta = cifrador.decrypt(textoCifradoBase64, clavePrivadaBanco);
+        System.out.println(respuesta);
+        try (PrintWriter out = response.getWriter()) {
+            /* TODO output your page here. You may use following sample code. */
+            out.print(respuesta);
+        }catch(IOException ioe){
+            ioe.printStackTrace();
         }
     }
 
