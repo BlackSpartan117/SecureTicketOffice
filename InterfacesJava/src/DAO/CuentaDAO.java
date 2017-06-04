@@ -22,10 +22,10 @@ public class CuentaDAO {
     }
 
     public void insertar( cuenta c ) {
-        String query = "INSERT INTO cuenta( id, nombre, apellido, noTarjetaCredito, saldo, vigencia )"
-                + "VALUES( '" + c.getId()+ "', '" + c.getNombre() + "', " + c.getApellido() + ", " 
-                + c.getNoTarjetaCredito()+ "','" + c.getSaldo()+ "','" + c.getVigencia() ;
-
+        String query = "INSERT INTO cuenta( id, nombre, apellido, noTarjetaCredito, cvv, saldo, vigencia )"
+                + "VALUES( " + c.getId()+ ", '" + c.getNombre() + "', '" + c.getApellido() + "','" 
+                + c.getNoTarjetaCredito()+ "', '"+ c.getCvv() +" '," + c.getSaldo()+ ",'" + c.getVigencia()+ "')" ;
+        System.out.println(query);
         
         try {
             if (this.conn == null) {
@@ -106,15 +106,14 @@ public class CuentaDAO {
             return null;
         }
     }*/
-    
-    public static void main(){
+    public static void main(String[] args) {
         String ruta = System.getProperty("user.dir")+ "/src/DAO/config.properties";
         PropiedadConexion connProp = new PropiedadConexion(ruta);
         ConexionMySQL ConexionBD = new ConexionMySQL(connProp);
         ConexionBD.getConexion();
         CuentaDAO Cuenta2 = new CuentaDAO(ConexionBD.getConn());
         
-        cuenta m = new cuenta (1, "Juan", "Perez", "04455", 2500, new Date(2000, 1, 1));
+        cuenta m = new cuenta (1, "Juan", "Perez", "04455", "100", 2500, new Date(2000, 1, 1));
         Cuenta2.insertar(m);
 }
   

@@ -104,7 +104,7 @@ public class Registro extends javax.swing.JFrame {
         getContentPane().add(jLabelNacimiento, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 200, -1, -1));
 
         jLabelSalir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/fondoPrincipal.jpg"))); // NOI18N
-        getContentPane().add(jLabelSalir, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 541, 440));
+        getContentPane().add(jLabelSalir, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 0, 541, 440));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

@@ -38,7 +38,9 @@ public class ConexionMySQL {
 
     public void getConexion() {
         try {
-            Class.forName(driverName);
+           // Class.forName(driverName);
+           Class.forName("com.mysql.jdbc.Driver");
+           
             this.conn = DriverManager.getConnection(url, usuario, password);
 
             if (conn == null) {

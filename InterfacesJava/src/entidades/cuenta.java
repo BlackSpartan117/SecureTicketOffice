@@ -16,6 +16,7 @@ public class cuenta {
     private String nombre;
     private String apellido;
     private String noTarjetaCredito;
+    private String cvv;
     private double saldo;
     private Date vigencia;
 
@@ -24,11 +25,12 @@ public cuenta(){
 
 }
 
-public cuenta(int id, String nombre, String apellido, String noTarjetaCredito, double saldo, Date vigencia){
+public cuenta(int id, String nombre, String apellido, String noTarjetaCredito, String cvv, double saldo, Date vigencia){
     this.id = id;
     this.nombre = nombre;
     this.apellido = apellido;
     this.noTarjetaCredito = noTarjetaCredito;
+    this.cvv = cvv;
     this.saldo = saldo;
     this.vigencia = vigencia;
 }
@@ -115,6 +117,20 @@ public cuenta(int id, String nombre, String apellido, String noTarjetaCredito, d
      */
     public void setVigencia(Date vigencia) {
         this.vigencia = vigencia;
+    }
+
+    /**
+     * @return the cvv
+     */
+    public String getCvv() {
+        return cvv;
+    }
+
+    /**
+     * @param cvv the cvv to set
+     */
+    public void setCvv(String cvv) {
+        this.cvv = cvv;
     }
 
 }
