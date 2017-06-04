@@ -110,6 +110,8 @@ function consultarEventos(evento){
                                 "</div>";
             }
             $("#lista-eventos").html(htmlEventos);
+            $("#loading").fadeOut(500);
+            $('#menu-principal').addClass('fixed-top');
             $('.boton-comprar').click(function(){
                 $('#modal-comprar').attr('data-evento', $(this).attr('data-evento'));
                 $('#modal-comprar').modal({
@@ -121,6 +123,7 @@ function consultarEventos(evento){
 }
 
 function handShake(){
+    //$("#loading").fadeIn(500);
     $.ajax({
         'type': 'POST',
         'url': 'Handshake',
