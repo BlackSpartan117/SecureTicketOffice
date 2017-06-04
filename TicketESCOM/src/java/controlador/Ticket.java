@@ -13,6 +13,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.security.AlgorithmParameters;
+import java.security.KeyPair;
+import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.LinkedHashMap;
@@ -21,7 +24,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -233,8 +239,32 @@ public class Ticket extends HttpServlet {
         System.out.println("Tarjeta: " + tarjeta);
        
         try{
+            String password = "test";
+            String salt;
+            int pswdIterations = 65536  ;
+            int keySize = 128;
+            byte[] ivBytes;
+            
+            salt = generateSalt();      
+            byte[] saltBytes = salt.getBytes("UTF-8");
+            
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+        PBEKeySpec spec = new PBEKeySpec(
+                password.toCharArray(), 
+                saltBytes, 
+                pswdIterations, 
+                keySize
+                );
+ 
+        SecretKey secretKey = factory.generateSecret(spec);
+        
+            String xml= new xmlcuenta().crearXML() ;
+            String cuenta= cifrar(xml,secretKey.getEncoded());
+            CifradorRSA cifrador = new CifradorRSA();
+        KeyPair llavesCliente = cifrador.generarLlaves(2048);
+        PublicKey llavePublicaBanco = (PublicKey) cifrador.leerLlave("llaves/public.key", CifradorRSA.TipoLlave.PUBLICA);
             /* Este bloque para verificar que el cifrado AES sobre la tarejta
-            funciones correctamente. Este descifrado lo debe hacer el banco.
+            funciones correctamente. Este descifrado lo debe hacer el banco.2A396E5EF3
             Aqui puede realizarse porque aun falta el cifrado RSA de la clave temporal
             */
             byte[] claveTemporal = Base64.getDecoder().decode(claveBase64.getBytes("UTF-8"));
@@ -251,6 +281,14 @@ public class Ticket extends HttpServlet {
         }catch(Exception ioe){
             ioe.printStackTrace();
         }
+    }
+    
+    public String generateSalt() {
+        SecureRandom random = new SecureRandom();
+        byte bytes[] = new byte[20];
+        random.nextBytes(bytes);
+        String s = new String(bytes);
+        return s;
     }
     
     private JsonArray crearJSON( LinkedList<Evento> eventos ) {
