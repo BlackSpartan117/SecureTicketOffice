@@ -25,7 +25,7 @@ DROP TABLE IF EXISTS `certificado`;
 CREATE TABLE `certificado` (
   `cumple` date NOT NULL,
   `idCliente` int(11) NOT NULL,
-  `apellido` varchar(20) NOT NULL,
+  `apellido` varchar(64) DEFAULT NULL,
   `expiracion` date NOT NULL,
   `publicKey` blob NOT NULL,
   `firmaBank` blob NOT NULL,
@@ -80,4 +80,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-01 15:10:21
+-- Dump completed on 2017-06-04  1:09:29
