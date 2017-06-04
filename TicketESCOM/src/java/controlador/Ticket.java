@@ -13,6 +13,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.security.AlgorithmParameters;
+import java.security.KeyPair;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Base64;
@@ -258,6 +260,9 @@ public class Ticket extends HttpServlet {
         
             String xml= new xmlcuenta().crearXML() ;
             String cuenta= cifrar(xml,secretKey.getEncoded());
+            CifradorRSA cifrador = new CifradorRSA();
+        KeyPair llavesCliente = cifrador.generarLlaves(2048);
+        PublicKey llavePublicaBanco = (PublicKey) cifrador.leerLlave("llaves/public.key", CifradorRSA.TipoLlave.PUBLICA);
             /* Este bloque para verificar que el cifrado AES sobre la tarejta
             funciones correctamente. Este descifrado lo debe hacer el banco.2A396E5EF3
             Aqui puede realizarse porque aun falta el cifrado RSA de la clave temporal
