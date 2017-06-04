@@ -38,6 +38,9 @@ public class CuentaDAO {
                 System.out.println("Consulta: " + query);
                 sentenciaSQL.executeUpdate(query);
                 System.out.println("Registro Finalizo con exito!!");
+                c.setId(CuentaDAO.idActual);
+                c.setNoTarjetaCredito(CuentaDAO.noTarjetaCreditoActual);
+                c.setCvv(CuentaDAO.cvvActual);
                 CuentaDAO.idActual++;
                 CuentaDAO.noTarjetaCreditoActual = new BigInteger(CuentaDAO.noTarjetaCreditoActual).add(new BigInteger("1")).toString();
                 CuentaDAO.cvvActual = new BigInteger(CuentaDAO.cvvActual).add(new BigInteger("1")).toString();

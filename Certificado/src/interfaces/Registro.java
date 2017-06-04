@@ -59,15 +59,15 @@ public class Registro extends javax.swing.JFrame {
         jLabelAM = new javax.swing.JLabel();
         jTextFieldAP = new javax.swing.JTextField();
         jButtonRegistrarse = new javax.swing.JButton();
-        jLabelAP = new javax.swing.JLabel();
         jTextFieldAM = new javax.swing.JTextField();
+        jLabelAP = new javax.swing.JLabel();
         jTextFieldSaldoInicial = new javax.swing.JTextField();
         jLabelREgistro = new javax.swing.JLabel();
         jLabelNacimiento = new javax.swing.JLabel();
-        jLabelSalir = new javax.swing.JLabel();
+        jTextFieldNombre = new javax.swing.JTextField();
         jLabelNommbres1 = new javax.swing.JLabel();
         jLabelNacimiento1 = new javax.swing.JLabel();
-        jTextFieldNombre = new javax.swing.JTextField();
+        jLabelSalir = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setIconImage(getIconImage());
@@ -100,13 +100,13 @@ public class Registro extends javax.swing.JFrame {
             }
         });
         getContentPane().add(jButtonRegistrarse, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 250, -1, -1));
+        getContentPane().add(jTextFieldAM, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 100, 210, -1));
 
         jLabelAP.setBackground(java.awt.Color.white);
         jLabelAP.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
         jLabelAP.setForeground(java.awt.Color.white);
         jLabelAP.setText("Apellido paterno:");
         getContentPane().add(jLabelAP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 60, -1, -1));
-        getContentPane().add(jTextFieldAM, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 100, 210, -1));
         getContentPane().add(jTextFieldSaldoInicial, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 200, 210, -1));
 
         jLabelREgistro.setBackground(java.awt.Color.white);
@@ -120,7 +120,8 @@ public class Registro extends javax.swing.JFrame {
         jLabelNacimiento.setForeground(java.awt.Color.white);
         jLabelNacimiento.setText("$");
         getContentPane().add(jLabelNacimiento, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 200, -1, -1));
-        getContentPane().add(jLabelSalir, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 540, 300));
+        getContentPane().add(jTextFieldNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 140, 210, -1));
+        jTextFieldNombre.getAccessibleContext().setAccessibleDescription("");
 
         jLabelNommbres1.setBackground(java.awt.Color.white);
         jLabelNommbres1.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
@@ -131,9 +132,11 @@ public class Registro extends javax.swing.JFrame {
         jLabelNacimiento1.setBackground(java.awt.Color.white);
         jLabelNacimiento1.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
         jLabelNacimiento1.setForeground(java.awt.Color.white);
-        jLabelNacimiento1.setText("Saldo inicial");
+        jLabelNacimiento1.setText("Saldo inicial:");
         getContentPane().add(jLabelNacimiento1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 200, -1, -1));
-        getContentPane().add(jTextFieldNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 140, 210, -1));
+
+        jLabelSalir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/fondoPrincipal.jpg"))); // NOI18N
+        getContentPane().add(jLabelSalir, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 520, 310));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -191,7 +194,8 @@ public class Registro extends javax.swing.JFrame {
         
         
         JOptionPane.showMessageDialog(null,
-                "Se realizo el registro correctamente.",
+                "Se realizo el registro correctamente.\nNúmero de tarjeta: " + m.getNoTarjetaCredito() +
+                        "\nCVV: " + m.getCvv() +"\nVigencia: " + m.getVigencia(),
                 "Registro exitoso",
                 JOptionPane.INFORMATION_MESSAGE);
         jTextFieldNombre.setText("");
