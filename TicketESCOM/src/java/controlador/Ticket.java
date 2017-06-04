@@ -239,6 +239,7 @@ public class Ticket extends HttpServlet {
         System.out.println("Tarjeta: " + tarjeta);
        
         try{
+            /*
             String password = "test";
             String salt;
             int pswdIterations = 65536  ;
@@ -263,6 +264,7 @@ public class Ticket extends HttpServlet {
             CifradorRSA cifrador = new CifradorRSA();
         KeyPair llavesCliente = cifrador.generarLlaves(2048);
         PublicKey llavePublicaBanco = (PublicKey) cifrador.leerLlave("llaves/public.key", CifradorRSA.TipoLlave.PUBLICA);
+            */
             /* Este bloque para verificar que el cifrado AES sobre la tarejta
             funciones correctamente. Este descifrado lo debe hacer el banco.2A396E5EF3
             Aqui puede realizarse porque aun falta el cifrado RSA de la clave temporal

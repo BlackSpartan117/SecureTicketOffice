@@ -41,62 +41,7 @@ $.validate({
                 },
                 callback: function(lobibox, type){
                     if(type === 'yes') {
-                        var clave = sjcl.random.randomWords(4); // 128 bits
-                        var objEvento   = new Object();
-                        var objTarjeta  = new Object();
-                        var objPeticion = new Object();
-                        var obj         = new Object();
-                        objEvento.evento   = $('#modal-comprar').attr('data-evento');
-                        objEvento.boletos  = '1';
-                        
-                        objTarjeta.tarjeta = $('#numero-tarjeta').val();
-                        objTarjeta.titular = $('#titular-tarjeta').val();
-                        objTarjeta.mes     = $('#vigencia-mes').val();
-                        objTarjeta.anio    = $('#vigencia-anio').val();
-                        objTarjeta.cvv     = $('#cvv-tarjeta').val();
-                        
-                        var datos = JSON.stringify(objTarjeta);
-                        var jsonCifrado  = encrypt(datos, clave);
-                        var textoTarjeta = sjcl.codec.base64.fromBits(jsonCifrado);
-                        var textoClave = sjcl.codec.base64.fromBits(clave);
-                        
-                        obj.clave   = textoClave;
-                        obj.evento  = objEvento;
-                        obj.tarjeta = textoTarjeta;
-                        
-                        objPeticion.accion = "comprar";
-                        objPeticion.datos = obj;
-                        var datos = JSON.stringify(objPeticion);
-                        var jsonCifrado  = encrypt(datos, bytesClave);
-                        var texto = sjcl.codec.base64.fromBits(jsonCifrado);
-                        $.ajax({
-                            'type': 'POST',
-                            'url': 'Ticket',
-                            'data': {'datos': texto},
-                            success: function(resp){
-                                if(resp != "OK") {
-                                    Lobibox.notify("error",{
-                                        'title': "Error en la transacci&oacute;n",
-                                        'msg': "La tarjeta proporcionada es inv&aacute;lida o no tiene fondos.",
-                                        'position': "bottom right",
-                                        'delay': 6000,
-                                        'width': 400,
-                                        'iconSource': "fontAwesome"
-                                    });
-                                } else {
-                                    $('#modal-comprar').modal("hide");
-                                    $("#formulario-pago")[0].reset();
-                                    Lobibox.notify("success", {
-                                        'title': "Boleto comprado",
-                                        'msg': "Se realizo el pago del boleto correctamente.",
-                                        'position': "bottom right",
-                                        'delay': 5000,
-                                        'width': 400,
-                                        'iconSource': "fontAwesome"
-                                    });
-                                }
-                            }
-                        });
+                        solicitarClavePublica();
                     }
                 }
             });
@@ -281,4 +226,143 @@ function parseHexString(str) {
     return result;
 }
 
+function pruebaRSA(){
+    var privateKey = "-----BEGIN RSA PRIVATE KEY-----" +
+"MIICXQIBAAKBgQDlOJu6TyygqxfWT7eLtGDwajtNFOb9I5XRb6khyfD1Yt3YiCgQ" +
+"WMNW649887VGJiGr/L5i2osbl8C9+WJTeucF+S76xFxdU6jE0NQ+Z+zEdhUTooNR" +
+"aY5nZiu5PgDB0ED/ZKBUSLKL7eibMxZtMlUDHjm4gwQco1KRMDSmXSMkDwIDAQAB" +
+"AoGAfY9LpnuWK5Bs50UVep5c93SJdUi82u7yMx4iHFMc/Z2hfenfYEzu+57fI4fv" +
+"xTQ//5DbzRR/XKb8ulNv6+CHyPF31xk7YOBfkGI8qjLoq06V+FyBfDSwL8KbLyeH" +
+"m7KUZnLNQbk8yGLzB3iYKkRHlmUanQGaNMIJziWOkN+N9dECQQD0ONYRNZeuM8zd" +
+"8XJTSdcIX4a3gy3GGCJxOzv16XHxD03GW6UNLmfPwenKu+cdrQeaqEixrCejXdAF" +
+"z/7+BSMpAkEA8EaSOeP5Xr3ZrbiKzi6TGMwHMvC7HdJxaBJbVRfApFrE0/mPwmP5" +
+"rN7QwjrMY+0+AbXcm8mRQyQ1+IGEembsdwJBAN6az8Rv7QnD/YBvi52POIlRSSIM" +
+"V7SwWvSK4WSMnGb1ZBbhgdg57DXaspcwHsFV7hByQ5BvMtIduHcT14ECfcECQATe" +
+"aTgjFnqE/lQ22Rk0eGaYO80cc643BXVGafNfd9fcvwBMnk0iGX0XRsOozVt5Azil" +
+"psLBYuApa66NcVHJpCECQQDTjI2AQhFc1yRnCU/YgDnSpJVm1nASoRUnU8Jfm3Oz" +
+"uku7JUXcVpt08DFSceCEX9unCuMcT72rAQlLpdZir876" +
+"-----END RSA PRIVATE KEY-----";
+    var publicKey = "-----BEGIN PUBLIC KEY-----" +
+"MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDlOJu6TyygqxfWT7eLtGDwajtN" +
+"FOb9I5XRb6khyfD1Yt3YiCgQWMNW649887VGJiGr/L5i2osbl8C9+WJTeucF+S76" +
+"xFxdU6jE0NQ+Z+zEdhUTooNRaY5nZiu5PgDB0ED/ZKBUSLKL7eibMxZtMlUDHjm4" +
+"gwQco1KRMDSmXSMkDwIDAQAB" +
+"-----END PUBLIC KEY-----";
+    // Encrypt with the public key...
+    var encrypt = new JSEncrypt();
+    encrypt.setPublicKey(publicKey);
+    var encrypted = encrypt.encrypt("Hola mundo");
+    // Decrypt with the private key...
+    var decrypt = new JSEncrypt();
+    decrypt.setPrivateKey(privateKey);
+    var uncrypted = decrypt.decrypt(encrypted);
+
+    // Now a simple check to see if the round-trip worked.
+    if (uncrypted == "Hola mundo") {
+    }
+    else {
+    }
+    $.ajax({
+        type: "POST",
+        url: "http://localhost:8080/BankESCOMaester/ConsultarClavePublica",
+        data: {'accion': 'publicKey'},
+        //if received a response from the server
+        success: function(resp) {
+            var publicKey = "-----BEGIN PUBLIC KEY-----" + resp + "-----END PUBLIC KEY-----";
+            var encrypt = new JSEncrypt();
+            encrypt.setPublicKey(publicKey);
+            var encrypted = encrypt.encrypt("Hola mundo12341234124143");
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:8080/BankESCOMaester/ConsultarClavePublica",
+                data: {'accion': 'descifrar', 'datos': encrypted},
+                //if received a response from the server
+                success: function(resp) {
+                    alert(resp);
+                }
+            });
+            // Decrypt with the private key...
+            //var decrypt = new JSEncrypt();
+            //decrypt.setPrivateKey(privateKey);
+            //var uncrypted = decrypt.decrypt(encrypted);
+        }
+    });
+}
+
+function solicitarClavePublica(){
+    $.ajax({
+        type: "POST",
+        url: "http://localhost:8080/BankESCOMaester/ConsultarClavePublica",
+        data: {'accion': 'publicKey'},
+        //if received a response from the server
+        success: function(resp) {
+            var publicKey = "-----BEGIN PUBLIC KEY-----" + resp + "-----END PUBLIC KEY-----";
+            comprarBoleto(publicKey);
+        }
+    });
+}
+
+function comprarBoleto(publicKey){
+    var cifrador = new JSEncrypt();
+    cifrador.setPublicKey(publicKey);
+    var clave = sjcl.random.randomWords(4); // 128 bits
+    var objEvento   = new Object();
+    var objTarjeta  = new Object();
+    var objPeticion = new Object();
+    var obj         = new Object();
+    objEvento.evento   = $('#modal-comprar').attr('data-evento');
+    objEvento.boletos  = '1';
+
+    objTarjeta.tarjeta = $('#numero-tarjeta').val();
+    objTarjeta.titular = $('#titular-tarjeta').val();
+    objTarjeta.mes     = $('#vigencia-mes').val();
+    objTarjeta.anio    = $('#vigencia-anio').val();
+    objTarjeta.cvv     = $('#cvv-tarjeta').val();
+
+    var datos = JSON.stringify(objTarjeta);
+    var jsonCifrado  = encrypt(datos, clave);
+    var textoTarjeta = sjcl.codec.base64.fromBits(jsonCifrado);
+    var textoClave = sjcl.codec.base64.fromBits(clave);
+    var textoClaveRSA = cifrador.encrypt(textoClave);
+    
+    obj.clave   = textoClaveRSA;
+    obj.evento  = objEvento;
+    obj.tarjeta = textoTarjeta;
+
+    objPeticion.accion = "comprar";
+    objPeticion.datos = obj;
+    var datos = JSON.stringify(objPeticion);
+    var jsonCifrado  = encrypt(datos, bytesClave);
+    var texto = sjcl.codec.base64.fromBits(jsonCifrado);
+    $.ajax({
+        'type': 'POST',
+        'url': 'Ticket',
+        'data': {'datos': texto},
+        success: function(resp){
+            if(resp != "OK") {
+                Lobibox.notify("error",{
+                    'title': "Error en la transacci&oacute;n",
+                    'msg': "La tarjeta proporcionada es inv&aacute;lida o no tiene fondos.",
+                    'position': "bottom right",
+                    'delay': 6000,
+                    'width': 400,
+                    'iconSource': "fontAwesome"
+                });
+            } else {
+                $('#modal-comprar').modal("hide");
+                $("#formulario-pago")[0].reset();
+                Lobibox.notify("success", {
+                    'title': "Boleto comprado",
+                    'msg': "Se realizo el pago del boleto correctamente.",
+                    'position': "bottom right",
+                    'delay': 5000,
+                    'width': 400,
+                    'iconSource': "fontAwesome"
+                });
+            }
+        }
+    });
+}
+
 handShake();
+//pruebaRSA();
