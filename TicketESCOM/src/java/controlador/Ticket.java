@@ -64,7 +64,7 @@ public class Ticket extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         String ruta = config.getServletContext().getRealPath("/conf/config.properties");
-        rutaJson = config.getServletContext().getRealPath("/WEB-INF/tarejtaTicket.json");
+        rutaJson = config.getServletContext().getRealPath("/WEB-INF/tarjetaTicket.json");
         System.out.println("la ruta es: " + ruta);
         connProp = new PropiedadConexion(ruta); // poner ruta
         conexionBD = new ConexionMySQL( connProp );
@@ -80,6 +80,7 @@ public class Ticket extends HttpServlet {
         JsonObject object = jsonReader.readObject();
         jsonReader.close();
         
+        System.out.println( "PETICION " + peticion );
         String accion = object.getString("accion");
         System.out.println( "ACCION  " + accion );
         
@@ -258,13 +259,10 @@ public class Ticket extends HttpServlet {
             JsonObject jsonObjectTarjetaTicket = jsonReader.readObject(); /*Obtenemos el objeto Json*/
             
             xml= new xmlcuenta().crearXML( tarjeta, jsonObjectTarjetaTicket.getString("tarjeta"), Double.toString(montoAPagar), claveBase64  );
-            
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Ticket.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
         String respFromBank = conectarConBanco( xml , response );
-        
         if( respFromBank != null ) {
             System.out.println("FROM BANCO" + respFromBank  );
         }
