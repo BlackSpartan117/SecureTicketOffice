@@ -63,7 +63,7 @@ public class Banco extends HttpServlet {
             LinkedList<ReciboPago> rp = new LinkedList<>();
             Cuenta cu = new BankDAO().getCuentaById( cuentas.get(1).getNoTarjetaCredito() ); 
             nombreArchivo = cuentas.get(0).getNombre();
-            rp.add( new ReciboPago( "001927", cu.getNombre(), cuentas.get(0).getNombre(), cu.getId().toString(), Double.toString(cuentas.get(0).getSaldo() ) ) );        
+            rp.add( new ReciboPago( "001927", cu.getNombre(), cuentas.get(0).getNombre(), cu.getId().toString(), Double.toString(cuentas.get(0).getSaldo() ) ) );
             crearReciboDePago( rp );
         } else {
             

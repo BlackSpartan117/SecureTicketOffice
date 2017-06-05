@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cuentas>
     <datos_cuenta>
-        <nombre></nombre>
-        <apellido></apellido>
-        <noTarjeta></noTarjeta>
-        <vigencia></vigencia>
+        <cliente></cliente> <!-- Almacena los datos de la tarteja del cliente cifrados -->
+        <noTarjeta></noTarjeta> <!-- guarda el numero de atrjeta de TicketESCOM -->
+        <monto></monto> <!-- Monto minimo que el cliente debe tener en su cuenta -->
+        <clave></clave> <!-- Es la clave ára el cifrado AES. Se cifra con la publica del banco -->
     </datos_cuenta>
 </cuentas>

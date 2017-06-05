@@ -4,9 +4,17 @@
         <servlet-name>Banco</servlet-name>
         <servlet-class>com.bankescomaester.controlador.Banco</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ConsultarClavePublica</servlet-name>
+        <servlet-class>com.bankescomaester.controlador.ConsultarClavePublica</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Banco</servlet-name>
         <url-pattern>/CuentaBancaria</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ConsultarClavePublica</servlet-name>
+        <url-pattern>/ConsultarClavePublica</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
