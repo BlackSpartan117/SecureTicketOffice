@@ -72,10 +72,10 @@ public class Banco extends HttpServlet {
             xmlCifrado.cargarXml( xmlr );
             Key llavePrivada =  rsa.leerLlave( "private.key", CifradorRSA.TipoLlave.PRIVADA );
             
-            byte[] claveTemporal = Base64.getDecoder().decode( xmlCifrado.getClave().getBytes("UTF-8") );
-            byte[] claveDecifrada = rsa.decrypt( claveTemporal, llavePrivada );
-            System.out.println("CLAVE DEC " + new String( claveDecifrada ) );
-            System.out.println("TARJETA DEC " + decifrar( claveDecifrada, xmlCifrado.getTarjetaCliente() ) );
+            String claveTemporal = rsa.decrypt(xmlCifrado.getClave(), llavePrivada);
+            byte[] claveDescifrada = Base64.getDecoder().decode( claveTemporal.getBytes("UTF-8") );
+            System.out.println("CLAVE DEC " + claveTemporal );
+            System.out.println("TARJETA DEC " + decifrar( claveDescifrada, xmlCifrado.getTarjetaCliente() ) );
         }
         
         //System.out.println("SIZE CUENTAS " + cuentas.size() );
