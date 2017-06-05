@@ -8,17 +8,21 @@ import com.bankescomaester.xml.ReadXML;
 import com.bankescomaester.xml.WriteXML;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.security.Key;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -59,13 +63,14 @@ public class Banco extends HttpServlet {
             throws ServletException, IOException {
         
         response.setContentType("text/html;charset=UTF-8");
-        String xmlr;
-        LinkedList<Cuenta> cuentas = null;
+        String xmlr, jsonCliente = null;
+        LinkedList<Cuenta> cuentas = new LinkedList<>();
+        ReadXML xmlCifrado = new ReadXML();
+        
         xmlr = request.getParameter("xml");
         System.out.println( "EN BANCUS   " + xmlr );
         
         if( xmlr != null ) {
-            ReadXML xmlCifrado = new ReadXML();
             CifradorRSA rsa = new CifradorRSA();
             
             rsa.setDirectorio( rutaKey );
@@ -74,19 +79,45 @@ public class Banco extends HttpServlet {
             
             String claveTemporal = rsa.decrypt(xmlCifrado.getClave(), llavePrivada);
             byte[] claveDescifrada = Base64.getDecoder().decode( claveTemporal.getBytes("UTF-8") );
-            System.out.println("CLAVE DEC " + claveTemporal );
-            System.out.println("TARJETA DEC " + decifrar( claveDescifrada, xmlCifrado.getTarjetaCliente() ) );
+            jsonCliente = decifrar( claveDescifrada, xmlCifrado.getTarjetaCliente() );
+            System.out.println("CLIENTE " + jsonCliente );
         }
         
-        //System.out.println("SIZE CUENTAS " + cuentas.size() );
-        if( realizarTransaccionBancaria( cuentas ) ) {
-            LinkedList<ReciboPago> rp = new LinkedList<>();
-            Cuenta cu = new BankDAO().getCuentaById( cuentas.get(1).getNoTarjetaCredito() ); 
-            nombreArchivo = cuentas.get(0).getNombre();
-            rp.add( new ReciboPago( "001927", cu.getNombre(), cuentas.get(0).getNombre(), cu.getId().toString(), Double.toString(cuentas.get(0).getSaldo() ) ) );
-            crearReciboDePago( rp );
-        } else {
+        Cuenta cliente = new Cuenta();
+        if( jsonCliente != null ) {
+            JsonReader jsonReader = Json.createReader( new StringReader( jsonCliente ) );
+            JsonObject object = jsonReader.readObject();
             
+            cliente.setNoTarjetaCredito( object.getString("tarjeta") );
+            cliente.setNombre( object.getString("titular").split(" ")[0] );
+            cliente.setApellido( object.getString("titular").substring( object.getString("titular").indexOf(" "), object.getString("titular").length() )  );
+            Calendar fec = new GregorianCalendar();
+            fec.set( Integer.parseInt( object.getString("anio") ), Integer.parseInt( object.getString("mes") ) - 1, 4 );
+            cliente.setVigencia( fec.getTime() );
+            cliente.setCvv( object.getString("cvv") );
+            System.out.println("APE " + cliente.getNoTarjetaCredito() + " " + cliente.getApellido() + " " + cliente.getCvv() );
+            //{"tarjeta":"1234567890123459","titular":"Omar Rodriguez Lopez","mes":"07","anio":"2022","cvv":"670"}
+        }
+        
+        BankDAO dao = new BankDAO();
+        if( dao.existeCuenta( cliente ) ) {
+            cliente = dao.getCuentaById( cliente.getNoTarjetaCredito() );
+            Cuenta ticket = dao.getCuentaById( xmlCifrado.getTarjetaTicket() );
+            
+            if( realizarTransaccionBancaria( cliente, ticket, Double.parseDouble( xmlCifrado.getMonto() ) ) ) {
+                LinkedList<ReciboPago> rp = new LinkedList<>();
+                nombreArchivo = cliente.getNombre();
+                
+                rp.add( new ReciboPago( "001927", ticket.getNombre(), cliente.getNombre(), cliente.getId().toString(), xmlCifrado.getMonto() ) );
+                crearReciboDePago( rp );
+            } else {
+                response.getWriter().print("Saldo insuficiente");
+                return;
+            }
+            
+        } else {
+            response.getWriter().print("Cuenta no existente");
+            return;
         }
         
         String xml = new WriteXML().crearXML();
@@ -116,38 +147,27 @@ public class Banco extends HttpServlet {
         }
     }
     
-    public boolean realizarTransaccionBancaria( LinkedList<Cuenta> cuentasXML ) {
+    public boolean realizarTransaccionBancaria( Cuenta cliente, Cuenta ticket, double monto ) {
         boolean transaccionCorrecta = false;
-        Cuenta cuentaUsuario;
         BankDAO dao = new BankDAO();
         
-        if( cuentasXML == null )
+        if( cliente == null || ticket == null )
             return transaccionCorrecta;
         
-        for( Cuenta datosPeticion : cuentasXML ) {
-            if( datosPeticion.getSaldo() > 1 ) { /* No es la cuenta de TicketsESCOM */
-                /* Busca al usuario por su tarjeta de credito*/
-                cuentaUsuario = dao.getCuentaById( datosPeticion.getNoTarjetaCredito() ); 
-                
-                /* Verificamos que el usuario tenga saldo suficiente para comprar el o
-                ** los eventos que solicito */
-                if( cuentaUsuario.getSaldo() > datosPeticion.getSaldo() ) {
-                    /* Tiene saldo suficiente. Actualizamos su saldo descontando 
-                    ** el monto equivalente al pago del o los eventos solicitados. */
-                    double nuevoSaldo = cuentaUsuario.getSaldo() - datosPeticion.getSaldo();
-                    double ganancia = datosPeticion.getSaldo();
-                    cuentaUsuario.setSaldo( nuevoSaldo );
-                    dao.updateCuenta( cuentaUsuario );
-                    datosPeticion = dao.getCuentaById( cuentasXML.get(1).getNoTarjetaCredito() ); 
-                    datosPeticion.setSaldo( ganancia + datosPeticion.getSaldo()  );
-                    dao.updateCuenta( datosPeticion );
-                    
-                    System.out.println( "USER" + cuentaUsuario.getApellido() + " " + cuentaUsuario.getSaldo() );
-                    transaccionCorrecta = true;
-                } else {
-                    transaccionCorrecta = false;
-                }
-            }
+        if( cliente.getSaldo() > monto ) {
+            /* Tiene saldo suficiente. Actualizamos su saldo descontando 
+            ** el monto equivalente al pago del o los eventos solicitados. */
+            cliente.setSaldo( cliente.getSaldo() - monto );
+            ticket.setSaldo( ticket.getSaldo() + monto );
+            
+            dao.updateCuenta( cliente );
+            dao.updateCuenta( ticket );
+
+            System.out.println( "USER" + cliente.getApellido() + " " + cliente.getSaldo() );
+            transaccionCorrecta = true;
+            
+        } else {
+            transaccionCorrecta = false;
         }
         
         return transaccionCorrecta;

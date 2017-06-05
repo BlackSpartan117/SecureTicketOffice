@@ -41,6 +41,28 @@ public class BankDAO {
         return null;
     }
     
+    public boolean existeCuenta( Cuenta cu ) {
+        Session sesion = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction trans = sesion.beginTransaction();
+        String hql = "FROM Cuenta WHERE noTarjetaCredito =:tarjeta";
+        List<Cuenta> cuentas = null;
+        
+        try {
+            Query q = sesion.createQuery( hql );
+            q.setParameter("tarjeta", cu.getNoTarjetaCredito() );
+            cuentas = q.list();
+            sesion.flush();
+            trans.commit();
+        } catch( HibernateException e ) {
+            e.printStackTrace();
+        }
+        
+        if( cuentas != null && cuentas.size() > 0 )
+            return true;
+        
+        return false;
+    }
+    
     public void updateCuenta( Cuenta c ) {
         Session sesion = NewHibernateUtil.getSessionFactory().openSession();
         Transaction trans = sesion.beginTransaction();
