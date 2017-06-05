@@ -137,7 +137,7 @@ public class Ticket extends HttpServlet {
             AlgorithmParameters params = cipher.getParameters();
             byte []ivBytes = params.getParameterSpec(IvParameterSpec.class).getIV();
             byte []cipherText = cipher.doFinal(datos.getBytes());
-            ByteBuffer buffer = ByteBuffer.allocate(1024 * 1024);
+            ByteBuffer buffer = ByteBuffer.allocate(1024 * 2048 * 2);
             buffer.put(ivBytes);
             buffer.put(cipherText);
             int tam = buffer.position();
