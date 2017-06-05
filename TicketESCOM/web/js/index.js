@@ -1,4 +1,5 @@
 var bytesClave; /*Clave de sesion*/
+var eventoSeleccionado = 'C'; /*Evento actual seleccionado*/
 
 $('.boton-comprar').click(function(){
     $('#modal-comprar').attr('data-evento', $(this).attr('data-evento'));
@@ -15,7 +16,8 @@ $('.list-group button').click(function(){
     var tipo = $(this).attr('data-evento');
     $(this).attr('style', "background-color: #428bca;color: white;");
     $(this).attr("disabled", "disabled");
-    //consultarEventos(tipo);
+    eventoSeleccionado = tipo;
+    consultarEventos(tipo);
 });
 $(".list-group button[data-evento='C']").attr('style', "background-color: #428bca;color: white;");
 $(".list-group button[data-evento='C']").attr("disabled", "disabled");
@@ -352,6 +354,7 @@ function comprarBoleto(publicKey){
                     'iconSource': "fontAwesome"
                 });
             } else {
+                consultarEventos(eventoSeleccionado);
                 $('#modal-comprar').modal("hide");
                 $("#formulario-pago")[0].reset();
                 Lobibox.notify("success", {
