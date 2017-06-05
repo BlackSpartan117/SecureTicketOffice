@@ -324,13 +324,12 @@ function comprarBoleto(publicKey){
     objTarjeta.anio    = $('#vigencia-anio').val();
     objTarjeta.cvv     = $('#cvv-tarjeta').val();
 
-    alert( clave );
     var datos = JSON.stringify(objTarjeta);
     var jsonCifrado  = encrypt(datos, clave); //Cifra con AES
     var textoTarjeta = sjcl.codec.base64.fromBits(jsonCifrado);
     var textoClave = sjcl.codec.base64.fromBits(clave);
     var textoClaveRSA = cifrador.encrypt(textoClave);
-    alert( textoClaveRSA );
+
     obj.clave   = textoClaveRSA;
     obj.evento  = objEvento;
     obj.tarjeta = textoTarjeta;
