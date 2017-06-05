@@ -64,7 +64,6 @@ public class Banco extends HttpServlet {
         
         response.setContentType("text/html;charset=UTF-8");
         String xmlr, jsonCliente = null;
-        LinkedList<Cuenta> cuentas = new LinkedList<>();
         ReadXML xmlCifrado = new ReadXML();
         
         xmlr = request.getParameter("xml");
