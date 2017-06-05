@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.7.18, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.18, for Win64 (x86_64)
 --
 -- Host: localhost    Database: banco
 -- ------------------------------------------------------
--- Server version	5.7.18-0ubuntu0.16.04.1
+-- Server version	5.7.18-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -25,12 +25,12 @@ DROP TABLE IF EXISTS `certificado`;
 CREATE TABLE `certificado` (
   `cumple` date NOT NULL,
   `idCliente` int(11) NOT NULL,
-  `apellido` varchar(64) DEFAULT NULL,
+  `apellido` varchar(50) NOT NULL,
   `expiracion` date NOT NULL,
   `publicKey` blob NOT NULL,
   `firmaBank` blob NOT NULL,
   PRIMARY KEY (`idCliente`),
-  CONSTRAINT `certificado_ibfk_1` FOREIGN KEY (`idCliente`) REFERENCES `cuenta` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `certificado_ibfk_1` FOREIGN KEY (`idCliente`) REFERENCES `cuenta` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -40,6 +40,7 @@ CREATE TABLE `certificado` (
 
 LOCK TABLES `certificado` WRITE;
 /*!40000 ALTER TABLE `certificado` DISABLE KEYS */;
+INSERT INTO `certificado` VALUES ('2022-06-04',1004,'TicketESCOM TicketESCOM TicketESCOM','2022-06-04','0Ç\"0\r	*ÜHÜ˜\r\0Ç\00Ç\nÇ\0ä\Á\≈\‚ßa]\Á†7\⁄¸öö˝he∑Voﬂ¶ﬁªt\ËΩ¸ƒöXHm¸≥õˆ?“∑ÛõS\Ë©Ãå\'–•9~≤®TU§∏îÕÜ9U\Z˛\ÔbÕ§kV·ΩúÉ!ZA\È?\»\⁄Jx^\‡h11Æ6ôL\r≤˚0ÒêZ˝©rg∫j∞)}mı,zT{\ŒR\⁄bJr\no}n˝7€øEô,ÕíRØ$≥úQzhèF\¬n˜PS\Îvvºì\„\\hqdäêÀ£Uo>w]éãÒ^w\Êˆáñ8¿ûR4\»\Ï\Õ$†6wlR\‡DT4ku®\⁄2°4Bö\ÊE≥4™n¿b\«\»	k”ó2_)ùˆxˆ<Ñc\0','πI,¡Yõü\‚•\‡jîf@(¯ÆìÙqKf\‘(âßYÜß/\Áù\"\Z	\—}ï˚]Vwqˆª˝•¨©ßÄhõl	Gµ\≈Ûﬁª\‹\Â†zæ\«UóãWõoAäÅ\“#p˝{¡›Ö©\Á%nWö[ÕàwüôLv}˚w\‘\\/#a\·˝\‘¸\Ï—ÇC¶!I\ÿ7\Ëˆ˚mùw0w\ﬁa≤˙¨ıˆ˛y,\Ã?Oëg%w:\≈<m$s\"SÙhØÿ∞Ùéâ\≈¸∫Ø#ah∑˝\'/A&ˆêˇ|\ﬂ\…U¨˘∑ò\ \‡ˆJc/\›¯ï-\√mD€±êèíÀ®Òj\–˘\¬ ≥∂kaN,Q^¡˘oÛ\‚Ä˙\’]=Ngø'),('2022-06-04',1005,'Omar Rodriguez Lopez','2022-06-04','0Ç\"0\r	*ÜHÜ˜\r\0Ç\00Ç\nÇ\0äı\ƒ¯]+p∑π*HÙ\\\Í\◊\’1∏n¶Åën\Ã\ÍGLB\“¸cI.\€\Á¡πŒà\ﬁg©úÛ1NvÙOy≥K\“%O\Ï\ËE\\U†ß˙\Á51m==,5\›\“]qnª!u®˜[¿1Fk£≈¥˝\0ñ¶[r`|πgù\Â—áÚ\ŸÒö\À8\”Za\–f=ì\'\‡Vmó@	^§∞o~\nF∑\—\…ph9H.rä++\ÀÜ…¨\ﬁ\«,ºg*)\∆{¶kÜ\≈fE\»\Í3Ä`.ı\≈“≠∂q˝©f\ \…I\È\\g˙Å.¢\ÏI/=&\‘\Z>ì\\≤t ®±\"åsN1ôë\◊e\ \›Âí∏;$m˘ò°&\0','t;s-£`\≈Ûë~Xf:%I&V˝rá§´Ui;@§\Ëı\Î≤\‚2Ò\Â5Xa:\›oª5\Í``´)\ÃK\ÎˆæîoÇ‘å>=˚´1,\‡\Œy{xI¯\∆∂E\Î˛tsAáP…°VXß/Ü\Ï4ïò?V…Ü*ú®âåV*£Gò\“Qº%ä.èã\–t\n†C\Ó[dê\—k\Ÿ&øíà\"z4AÄ\r\‰\07A\"öY[Nìz≠F\ÿ\…–Ä:]l.J›£(\Z\”6n\Â\Ÿ\…\rΩ>1Æˆ≤—¶ﬂÑH|†˝\ƒ\»Vù=\Z’ä/ûÄ±ù6b1F˜\ÔTá\◊@\÷d˛`g\“\Ÿdb\›¿6&t\…˛\Â≠|ñ\√Z>`\Z}');
 /*!40000 ALTER TABLE `certificado` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -52,14 +53,14 @@ DROP TABLE IF EXISTS `cuenta`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `cuenta` (
   `nombre` varchar(20) NOT NULL,
-  `id` int(11) NOT NULL,
-  `apellido` varchar(30) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `apellido` varchar(50) NOT NULL,
   `noTarjetaCredito` varchar(20) NOT NULL,
   `cvv` varchar(3) NOT NULL,
   `saldo` double NOT NULL,
   `vigencia` date NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1006 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -68,6 +69,7 @@ CREATE TABLE `cuenta` (
 
 LOCK TABLES `cuenta` WRITE;
 /*!40000 ALTER TABLE `cuenta` DISABLE KEYS */;
+INSERT INTO `cuenta` VALUES ('TicketESCOM',1004,'TicketESCOM TicketESCOM','1234567890123458','669',2309,'2022-06-04'),('Omar',1005,'Rodriguez Lopez','1234567890123459','670',7791,'2022-06-04');
 /*!40000 ALTER TABLE `cuenta` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -80,4 +82,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-04  1:09:29
+-- Dump completed on 2017-06-05  4:02:49
