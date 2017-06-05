@@ -137,7 +137,7 @@ public class Ticket extends HttpServlet {
             AlgorithmParameters params = cipher.getParameters();
             byte []ivBytes = params.getParameterSpec(IvParameterSpec.class).getIV();
             byte []cipherText = cipher.doFinal(datos.getBytes());
-            ByteBuffer buffer = ByteBuffer.allocate(1024 * 128);
+            ByteBuffer buffer = ByteBuffer.allocate(1024 * 1024);
             buffer.put(ivBytes);
             buffer.put(cipherText);
             int tam = buffer.position();
@@ -249,9 +249,9 @@ public class Ticket extends HttpServlet {
         System.out.println("Tarjeta: " + tarjeta);
        
         String xml = null;
-        //Consultar el precio del evento en la base de datos
+        double monto = consulta.obtenerEvento( evento.getString("evento") ).getPrecio();
         String numBoletos = evento.getString("boletos");
-        double montoAPagar = 1050.50 * Double.parseDouble( numBoletos );
+        double montoAPagar = monto * Double.parseDouble( numBoletos );
         
         try {
             InputStream fis = new FileInputStream( rutaJson ); /*Abrimos el Json*/
@@ -263,17 +263,28 @@ public class Ticket extends HttpServlet {
             Logger.getLogger(Ticket.class.getName()).log(Level.SEVERE, null, ex);
         }
         String respFromBank = conectarConBanco( xml , response );
-        if( respFromBank != null ) {
-            System.out.println("FROM BANCO" + respFromBank  );
-        }
+        System.out.println("FROM BANCO " + respFromBank  );
         
         try {
             PrintWriter out = response.getWriter();
-            out.print("OK");
             
+            if( respFromBank == null ) {
+                out.print("ERROR");
+                
+            } else if( respFromBank.equals("Cuenta no existente") ) {
+                out.print("SC");
+                
+            } else if( respFromBank.equals("Saldo insuficiente") ) {
+                out.print("SinSaldo");
+                
+            } else {
+                out.print("OK");            
+            }
+            
+            out.close();
         } catch (IOException ex) {
-            Logger.getLogger(Ticket.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            Logger.getLogger(Ticket.class.getName()).log(Level.SEVERE, null, ex); 
+        } 
         
         
 //        try{

@@ -103,4 +103,41 @@ public class DAO {
             return null;
         }
     }
+    
+    public Evento obtenerEvento( String id ) {
+        String query = "SELECT * FROM evento WHERE id=" + id;
+        Evento evs;
+        LinkedList<Evento> eventos = new LinkedList();
+        
+        try {
+            if (this.conn == null) {
+                System.out.println("La conexion es nula");
+            }
+            
+            sentenciaSQL = this.conn.createStatement();
+            System.out.println("Consulta: " + query);
+            ResultSet r = sentenciaSQL.executeQuery( query );
+            
+            while( r.next() ) {
+                evs = new Evento();
+                evs.setId( Integer.parseInt( r.getString(1) ) );
+                evs.setNombre( r.getString(2) );
+                evs.setTipo( r.getString(3) );
+                evs.setPrecio( Double.parseDouble( r.getString(4) ) );
+                evs.setAsientos( Integer.parseInt( r.getString(5) ) );
+                evs.setFecha( r.getDate(6) );
+                evs.setFoto( r.getBytes("foto") );
+                evs.setLugar( r.getString(8) );
+                
+                eventos.add( evs );
+            }
+            
+            if( eventos.size() > 0 ) {
+                return eventos.get(0);
+            } else return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
