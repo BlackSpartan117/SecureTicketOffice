@@ -5,6 +5,7 @@
  */
 package com.bankescomaester.xml;
 
+import banco.util.CifradorRSA;
 import com.bankescomaester.entities.Cuenta;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -27,15 +28,19 @@ import org.jdom2.input.SAXBuilder;
  */
 public class ReadXML {
     
+    private String tarjetaCliente;
+    private String tarjetaTicket;
+    private String monto;
+    private String clave;
+    
     public ReadXML() {
         
     }
     
-    public LinkedList<Cuenta> cargarXml( String xml ) {
+    public void cargarXml( String xml ) {
         //Se crea un SAXBuilder para poder parsear el archivo
         SAXBuilder builder = new SAXBuilder();
         InputStream streamXML = new ByteArrayInputStream( xml.getBytes( StandardCharsets.UTF_8 ) );
-        LinkedList<Cuenta> cuentas = new LinkedList<>();
         
         try {
             //Se crea el documento a traves del archivo
@@ -46,52 +51,50 @@ public class ReadXML {
 
             //Se obtiene la lista de hijos de la raiz
             List<Element> list = rootNode.getChildren();
-            Cuenta cuenta;
             
-            //Se recorre la lista de hijos
-            for( int i = 0; i < list.size(); i++ ) {
-                //System.out.println( "ELEMENTO " + list.get(i).toString() );
-                Element elemento = (Element) list.get(i);
-                cuenta = new Cuenta();
-                
-                for( Element e : elemento.getChildren() ) {
-                    //System.out.println("ELEMENTO e.value " + " " + e.getName() + " " + e.getValue() );
-                    cuenta = setPropiedad( cuenta, e.getName(), e.getValue() );
-                }
-                
-                cuentas.add( cuenta );
-            }
+            Element elemento = (Element) list.get(0);
+            setTarjetaCliente( elemento.getChild("cliente").getValue() );
+            setTarjetaTicket( elemento.getChild("noTarjeta").getValue() );
+            setMonto( elemento.getChild("monto").getValue() );
+            setClave( elemento.getChild("clave").getValue() );
             
         } catch( JDOMException jdomex ) {
             System.out.println( jdomex.getMessage() );
         } catch( IOException ex ) {
             Logger.getLogger(ReadXML.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return cuentas;
-    }
-    
-    private Cuenta setPropiedad( Cuenta c, String etiqueta, String propiedad ) {
-        switch( etiqueta ) {
-            case "nombre":
-                c.setNombre(propiedad );
-                break;
-            case "noTarjeta":
-                c.setNoTarjetaCredito(propiedad );
-                break;
-            case "cvv":
-                c.setCvv(propiedad );
-                break;
-            case "vigencia":
-                Calendar fecha = new GregorianCalendar();
-                fecha.set(Integer.parseInt(propiedad.split("-")[0] ), Integer.parseInt(propiedad.split("-")[1] ), 1 );
-                
-                c.setVigencia( fecha.getTime() );
-                break;
-            case "precio":
-                c.setSaldo(Double.parseDouble(propiedad ) );
-                break;
-        }
         
-        return c;
+    }
+
+    public String getTarjetaCliente() {
+        return tarjetaCliente;
+    }
+
+    public void setTarjetaCliente(String tarjetaCliente) {
+        this.tarjetaCliente = tarjetaCliente;
+    }
+
+    public String getTarjetaTicket() {
+        return tarjetaTicket;
+    }
+
+    public void setTarjetaTicket(String tarjetaTicket) {
+        this.tarjetaTicket = tarjetaTicket;
+    }
+
+    public String getMonto() {
+        return monto;
+    }
+
+    public void setMonto(String monto) {
+        this.monto = monto;
+    }
+
+    public String getClave() {
+        return clave;
+    }
+
+    public void setClave(String clave) {
+        this.clave = clave;
     }
 }

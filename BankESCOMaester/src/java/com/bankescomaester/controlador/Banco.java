@@ -1,5 +1,6 @@
 package com.bankescomaester.controlador;
 
+import banco.util.CifradorRSA;
 import com.bankescomaester.dao.BankDAO;
 import com.bankescomaester.entities.Cuenta;
 import com.bankescomaester.entities.ReciboPago;
@@ -7,9 +8,17 @@ import com.bankescomaester.xml.ReadXML;
 import com.bankescomaester.xml.WriteXML;
 import java.io.File;
 import java.io.IOException;
+import java.security.Key;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -33,15 +42,16 @@ import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 
 public class Banco extends HttpServlet {
 
-    private String ruta, rutaImgIPN, imgESCOM, pdfs, nombreArchivo = "Ticket";
+    private String ruta, rutaImgIPN, imgESCOM, pdfs, nombreArchivo = "Ticket", rutaKey;
 
     @Override
     public void init( ServletConfig config ) throws ServletException {
         ruta = config.getServletContext().getRealPath("/conf/ticket.jasper");
         pdfs = config.getServletContext().getRealPath("/conf/pdf");
+        rutaKey = config.getServletContext().getRealPath("/WEB-INF/");
         rutaImgIPN = config.getServletContext().getRealPath("/images/ipn.png");
         imgESCOM = config.getServletContext().getRealPath("/images/escom.png");
-        System.out.println("la ruta es: " + ruta);
+        System.out.println("la rutaKey es: " + rutaKey);
         System.out.println("la ruta es: " + pdfs);
     }
     
@@ -55,10 +65,20 @@ public class Banco extends HttpServlet {
         System.out.println( "EN BANCUS   " + xmlr );
         
         if( xmlr != null ) {
-            cuentas = new ReadXML().cargarXml( xmlr );
+            ReadXML xmlCifrado = new ReadXML();
+            CifradorRSA rsa = new CifradorRSA();
+            
+            rsa.setDirectorio( rutaKey );
+            xmlCifrado.cargarXml( xmlr );
+            Key llavePrivada =  rsa.leerLlave( "private.key", CifradorRSA.TipoLlave.PRIVADA );
+            
+            byte[] claveTemporal = Base64.getDecoder().decode( xmlCifrado.getClave().getBytes("UTF-8") );
+            byte[] claveDecifrada = rsa.decrypt( claveTemporal, llavePrivada );
+            System.out.println("CLAVE DEC " + new String( claveDecifrada ) );
+            System.out.println("TARJETA DEC " + decifrar( claveDecifrada, xmlCifrado.getTarjetaCliente() ) );
         }
         
-        System.out.println("SIZE CUENTAS " + cuentas.size() );
+        //System.out.println("SIZE CUENTAS " + cuentas.size() );
         if( realizarTransaccionBancaria( cuentas ) ) {
             LinkedList<ReciboPago> rp = new LinkedList<>();
             Cuenta cu = new BankDAO().getCuentaById( cuentas.get(1).getNoTarjetaCredito() ); 
@@ -73,6 +93,27 @@ public class Banco extends HttpServlet {
         response.setContentType("text/xml");
         response.getWriter().println( xml );
         
+    }
+    
+    private String decifrar(byte []clave, String datosBase64){
+        try{
+            byte[] decodedString = Base64.getDecoder().decode(datosBase64.getBytes("UTF-8"));
+            
+            byte []ivBytes = Arrays.copyOfRange(decodedString, 0, 16);
+            byte []cipherText = Arrays.copyOfRange(decodedString, 16, decodedString.length);
+            
+            SecretKeySpec secret = new SecretKeySpec(clave, "AES");
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(ivBytes));
+            
+            byte[] decryptedTextBytes = null;
+            decryptedTextBytes = cipher.doFinal(cipherText);
+
+            return new String(decryptedTextBytes);
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
     
     public boolean realizarTransaccionBancaria( LinkedList<Cuenta> cuentasXML ) {

@@ -36,7 +36,11 @@ public class CifradorRSA {
     
     public CifradorRSA(HttpServlet servlet){
         directorio = servlet.getServletContext().getRealPath("/")+"/WEB-INF/";
+    }    
+
+    public CifradorRSA() {
     }
+    
     public KeyPair generarLlaves(int longitud){
         try{
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
@@ -122,5 +126,13 @@ public class CifradorRSA {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public String getDirectorio() {
+        return directorio;
+    }
+
+    public void setDirectorio(String directorio) {
+        this.directorio = directorio;
     }
 }
