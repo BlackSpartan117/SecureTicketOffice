@@ -2,6 +2,8 @@ package controlador;
 
 import entidades.Evento;
 import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -57,10 +59,12 @@ public class Ticket extends HttpServlet {
     private DAO consulta;
     private BigInteger primoDH;
     private BigInteger generadorDH;
+    private String rutaJson;
     
     @Override
     public void init(ServletConfig config) throws ServletException {
         String ruta = config.getServletContext().getRealPath("/conf/config.properties");
+        rutaJson = config.getServletContext().getRealPath("/WEB-INF/tarejtaTicket.json");
         System.out.println("la ruta es: " + ruta);
         connProp = new PropiedadConexion(ruta); // poner ruta
         conexionBD = new ConexionMySQL( connProp );
@@ -157,14 +161,14 @@ public class Ticket extends HttpServlet {
     
 /* Ejemplo extraido de http://www.theserverside.com/news/thread.tss?thread_id=21884
     ** http://programacionextrema.com/2015/11/26/realizar-una-peticion-post-en-java/*/
-    private void conectarConBanco( HttpServletRequest request, HttpServletResponse response ) {
+    private String conectarConBanco( String datosEnviar, HttpServletResponse response ) {
+        String resp = null;
+        
         try {
             URL url = new URL("http://localhost:8080/BankESCOMaester/CuentaBancaria");
             Map<String, Object> params = new LinkedHashMap<>();
             
-            params.put("a", "10");
-            params.put("b", "10");
-            params.put("xml", new xmlcuenta().crearXML() );
+            params.put("xml", datosEnviar );
             
             StringBuilder postData = new StringBuilder();
             
@@ -188,10 +192,14 @@ public class Ticket extends HttpServlet {
             InputStream stream = conn.getInputStream();
             BufferedInputStream bin = new BufferedInputStream( stream );
             int i;
+            byte []buffer = new byte[bin.available()];
             
-            while( ( i = bin.read() ) != -1 ){
+            bin.read(buffer, 0, bin.available() );
+            
+            resp = new String( buffer );
+            /*while( ( i = bin.read() ) != -1 ) {
                 System.out.write( i );
-            }
+            }*/
             
         } catch (MalformedURLException ex) {
             Logger.getLogger(Ticket.class.getName()).log(Level.SEVERE, null, ex);
@@ -199,6 +207,7 @@ public class Ticket extends HttpServlet {
             Logger.getLogger(Ticket.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+        return resp;
     }
     
     private void iniciarPagina( JsonObject peticion, HttpServletRequest request, HttpServletResponse response ) {
@@ -238,51 +247,82 @@ public class Ticket extends HttpServlet {
         System.out.println("Evento: " + evento);
         System.out.println("Tarjeta: " + tarjeta);
        
-        try{
-            /*
-            String password = "test";
-            String salt;
-            int pswdIterations = 65536  ;
-            int keySize = 128;
-            byte[] ivBytes;
-            
-            salt = generateSalt();      
-            byte[] saltBytes = salt.getBytes("UTF-8");
-            
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        PBEKeySpec spec = new PBEKeySpec(
-                password.toCharArray(), 
-                saltBytes, 
-                pswdIterations, 
-                keySize
-                );
- 
-        SecretKey secretKey = factory.generateSecret(spec);
+        String xml = null;
+        //Consultar el precio del evento en la base de datos
+        String numBoletos = evento.getString("boletos");
+        double montoAPagar = 1050.50 * Double.parseDouble( numBoletos );
         
-            String xml= new xmlcuenta().crearXML() ;
-            String cuenta= cifrar(xml,secretKey.getEncoded());
-            CifradorRSA cifrador = new CifradorRSA();
-        KeyPair llavesCliente = cifrador.generarLlaves(2048);
-        PublicKey llavePublicaBanco = (PublicKey) cifrador.leerLlave("llaves/public.key", CifradorRSA.TipoLlave.PUBLICA);
-            */
-            /* Este bloque para verificar que el cifrado AES sobre la tarejta
-            funciones correctamente. Este descifrado lo debe hacer el banco.2A396E5EF3
-            Aqui puede realizarse porque aun falta el cifrado RSA de la clave temporal
-            */
-            byte[] claveTemporal = Base64.getDecoder().decode(claveBase64.getBytes("UTF-8"));
-            String jsonTarjeta  = descifrar(claveTemporal, tarjeta);
-            System.out.println("Tarjeta descifrada: " + jsonTarjeta);
+        try {
+            InputStream fis = new FileInputStream( rutaJson ); /*Abrimos el Json*/
+            JsonReader jsonReader = Json.createReader( fis ); /*Creamos unJsonReader*/
+            JsonObject jsonObjectTarjetaTicket = jsonReader.readObject(); /*Obtenemos el objeto Json*/
+            
+            xml= new xmlcuenta().crearXML( tarjeta, jsonObjectTarjetaTicket.getString("tarjeta"), Double.toString(montoAPagar), claveBase64  );
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Ticket.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        String respFromBank = conectarConBanco( xml , response );
+        
+        if( respFromBank != null ) {
+            System.out.println("FROM BANCO" + respFromBank  );
+        }
+        
+        try {
             PrintWriter out = response.getWriter();
             out.print("OK");
-            /*
-            String xml= new xmlcuenta().crearXML() ;
-            String cuenta = this.cifrar(request, response, xml);
-            conectarConBanco(request, response);
-            */
-            //System.out.println(cuenta);
-        }catch(Exception ioe){
-            ioe.printStackTrace();
+            
+        } catch (IOException ex) {
+            Logger.getLogger(Ticket.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        
+//        try{
+//            /*
+//            String password = "test";
+//            String salt;
+//            int pswdIterations = 65536  ;
+//            int keySize = 128;
+//            byte[] ivBytes;
+//            
+//            salt = generateSalt();      
+//            byte[] saltBytes = salt.getBytes("UTF-8");
+//            
+//            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+//        PBEKeySpec spec = new PBEKeySpec(
+//                password.toCharArray(), 
+//                saltBytes, 
+//                pswdIterations, 
+//                keySize
+//                );
+// 
+//        SecretKey secretKey = factory.generateSecret(spec);
+//        
+//            String xml= new xmlcuenta().crearXML() ;
+//            String cuenta= cifrar(xml,secretKey.getEncoded());
+//            CifradorRSA cifrador = new CifradorRSA();
+//        KeyPair llavesCliente = cifrador.generarLlaves(2048);
+//        PublicKey llavePublicaBanco = (PublicKey) cifrador.leerLlave("llaves/public.key", CifradorRSA.TipoLlave.PUBLICA);
+//            */
+//            /* Este bloque para verificar que el cifrado AES sobre la tarejta
+//            funciones correctamente. Este descifrado lo debe hacer el banco.2A396E5EF3
+//            Aqui puede realizarse porque aun falta el cifrado RSA de la clave temporal
+//            */
+//            byte[] claveTemporal = Base64.getDecoder().decode(claveBase64.getBytes("UTF-8"));
+//            //String jsonTarjeta  = descifrar(claveTemporal, tarjeta);
+//            //System.out.println("Tarjeta descifrada: " + jsonTarjeta);
+//            PrintWriter out = response.getWriter();
+//            out.print("OK");
+//            /*
+//            String xml= new xmlcuenta().crearXML() ;
+//            String cuenta = this.cifrar(request, response, xml);
+//            conectarConBanco(request, response);
+//            */
+//            //System.out.println(cuenta);
+//        }catch(Exception ioe){
+//            ioe.printStackTrace();
+//        }
     }
     
     public String generateSalt() {

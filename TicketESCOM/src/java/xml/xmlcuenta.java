@@ -39,36 +39,27 @@ public class xmlcuenta {
         return xml;
     }
     
-    public String crearXML(String Tarjetauser, String precio,String cvv,String Titular,String Vencimiento) {
+    public String crearXML( String tarjetaCliente, String tarjetaTicket, String monto, String clave ) {
         String xml;
 
         Element cuenta = new Element("cuentas");
         Document doc = new Document(cuenta);
 
         Element datos_cuenta = new Element("datos_cuenta");
-        Element nombre =new Element("nombre").setText(Titular);
+        
+        Element nombre = new Element("cliente").setText( tarjetaCliente );
         datos_cuenta.addContent(nombre);
-        datos_cuenta.addContent(new Element("noTarjeta").setText(Tarjetauser));
-        datos_cuenta.addContent(new Element("cvv").setText(cvv));
-        datos_cuenta.addContent(new Element("vigencia").setText(Vencimiento));
-        datos_cuenta.addContent(new Element("precio").setText(precio));
+        datos_cuenta.addContent(new Element("noTarjeta").setText( tarjetaTicket ) );
+        datos_cuenta.addContent(new Element("monto").setText( monto ) );
+        datos_cuenta.addContent(new Element("clave").setText( clave ) );
         
-        doc.getRootElement().addContent(datos_cuenta);
+        doc.getRootElement().addContent( datos_cuenta );
         
-        Element datos_cuenta2 = new Element("datos_cuenta");
-        Element nombre2 =new Element("nombre").setText("Tickets");
-        datos_cuenta2.addContent(nombre2);
-        datos_cuenta2.addContent(new Element("noTarjeta").setText("987654"));
-        datos_cuenta2.addContent(new Element("cvv").setText("456"));
-        datos_cuenta2.addContent(new Element("vigencia").setText("10-2020"));
-        datos_cuenta2.addContent(new Element("precio").setText("00.0"));
-        doc.getRootElement().addContent(datos_cuenta2);
-
         XMLOutputter xmlOutput = new XMLOutputter();
 
         // display nice nice
         xmlOutput.setFormat(Format.getPrettyFormat());
-        xml = xmlOutput.outputString(doc);
+        xml = xmlOutput.outputString( doc );
 
         //System.out.println();
         //System.out.println("File Saved! " + xml);
