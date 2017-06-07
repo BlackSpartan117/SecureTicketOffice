@@ -47,4 +47,27 @@ public class WriteXML {
 
         return xml;
     }
+    
+    public String crearXML( String name ) {
+        String xml;
+
+        Element company = new Element("BankESCOMaester");
+        Document doc = new Document( company );
+
+        Element cliente = new Element("cliente");
+        cliente.addContent( new Element("nombre").setText( name ) );
+
+        doc.getRootElement().addContent( cliente );
+
+        XMLOutputter xmlOutput = new XMLOutputter();
+
+        // display nice nice
+        xmlOutput.setFormat(Format.getPrettyFormat());
+        xml = xmlOutput.outputString( doc );
+
+        System.out.println();
+        //System.out.println("File Saved! " + xml);
+
+        return xml;
+    }
 }

@@ -21,6 +21,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.json.Json;
+import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.servlet.ServletConfig;
@@ -109,6 +110,7 @@ public class Banco extends HttpServlet {
                 
                 rp.add( new ReciboPago( "001927", ticket.getNombre(), cliente.getNombre(), cliente.getId().toString(), xmlCifrado.getMonto() ) );
                 crearReciboDePago( rp );
+
             } else {
                 response.getWriter().print("Saldo insuficiente");
                 return;
@@ -119,9 +121,9 @@ public class Banco extends HttpServlet {
             return;
         }
         
-        String xml = new WriteXML().crearXML();
-        response.setContentType("text/xml");
-        response.getWriter().println( xml );
+        //String xml = new WriteXML().crearXML( nombreArchivo + " " + cliente.getApellido() );
+        //response.setContentType("text/xml");
+        response.getWriter().println( nombreArchivo + " " + cliente.getApellido() );
         
     }
     
