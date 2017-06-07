@@ -344,8 +344,10 @@ function comprarBoleto(publicKey){
         'type': 'POST',
         'url': 'Ticket',
         'data': {'datos': texto},
-        success: function(resp){
-            if(resp != "OK") {
+        success: function( resp ){
+            var status = $.parseJSON( resp );
+            
+            if(status[0].RESP != "OK") {
                 Lobibox.notify("error",{
                     'title': "Error en la transacci&oacute;n",
                     'msg': "La tarjeta proporcionada es inv&aacute;lida o no tiene fondos.",
@@ -360,11 +362,15 @@ function comprarBoleto(publicKey){
                 $("#formulario-pago")[0].reset();
                 Lobibox.notify("success", {
                     'title': "Boleto comprado",
-                    'msg': "Se realizo el pago del boleto correctamente.",
+                    'msg': "Se realizo el pago del boleto correctamente. Presione este mensaje para ver su boleto.",
                     'position': "bottom right",
-                    'delay': 5000,
+                    'delay': false,
                     'width': 400,
-                    'iconSource': "fontAwesome"
+                    'iconSource': "fontAwesome",
+                    'closeOnClick': true,
+                    onClick: function(){
+                        window.open("conf/pdf/" + status[0].pdf + ".pdf",'_blank');
+                    }
                 });
             }
         }

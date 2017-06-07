@@ -1,7 +1,9 @@
 package controlador;
 
+import entidades.Boleto;
 import entidades.Evento;
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,21 +17,18 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.security.AlgorithmParameters;
-import java.security.KeyPair;
-import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -45,6 +44,16 @@ import javax.servlet.http.HttpSession;
 import negocio.ConexionMySQL;
 import negocio.DAO;
 import negocio.PropiedadConexion;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.export.Exporter;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 import xml.xmlcuenta;
 
 
@@ -60,11 +69,18 @@ public class Ticket extends HttpServlet {
     private BigInteger primoDH;
     private BigInteger generadorDH;
     private String rutaJson;
+    private String rutaJasper, code, logo, publicidad, pdfs;
     
     @Override
     public void init(ServletConfig config) throws ServletException {
         String ruta = config.getServletContext().getRealPath("/conf/config.properties");
         rutaJson = config.getServletContext().getRealPath("/WEB-INF/tarjetaTicket.json");
+        rutaJasper = config.getServletContext().getRealPath("/conf/boleto.jasper");
+        code = config.getServletContext().getRealPath("/img/code.jpg");
+        logo = config.getServletContext().getRealPath("/img/logo.png");
+        publicidad = config.getServletContext().getRealPath("/img/publicidad.jpg");
+        pdfs = config.getServletContext().getRealPath("/conf/pdf");
+        
         System.out.println("la ruta es: " + ruta);
         connProp = new PropiedadConexion(ruta); // poner ruta
         conexionBD = new ConexionMySQL( connProp );
@@ -193,14 +209,11 @@ public class Ticket extends HttpServlet {
             InputStream stream = conn.getInputStream();
             BufferedInputStream bin = new BufferedInputStream( stream );
             int i;
-            byte []buffer = new byte[bin.available()];
             
-            bin.read(buffer, 0, bin.available() );
-            
-            resp = new String( buffer );
-            /*while( ( i = bin.read() ) != -1 ) {
-                System.out.write( i );
-            }*/
+            resp = "";
+            while( ( i = bin.read() ) != -1 ) {
+                resp += Character.toString( (char)i );
+            }
             
         } catch (MalformedURLException ex) {
             Logger.getLogger(Ticket.class.getName()).log(Level.SEVERE, null, ex);
@@ -262,76 +275,40 @@ public class Ticket extends HttpServlet {
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Ticket.class.getName()).log(Level.SEVERE, null, ex);
         }
-        String respFromBank = conectarConBanco( xml , response );
+        String respFromBank = conectarConBanco( xml, response );
         System.out.println("FROM BANCO " + respFromBank  );
         
         try {
             PrintWriter out = response.getWriter();
+            JsonArrayBuilder values = Json.createArrayBuilder();
             
             if( respFromBank == null ) {
-                out.print("ERROR");
+                values.add(Json.createObjectBuilder()
+                    .add("RESP", "ERROR" ) );
+                out.print( values.build() );
                 
             } else if( respFromBank.equals("Cuenta no existente") ) {
-                out.print("SC");
+                values.add(Json.createObjectBuilder()
+                    .add("RESP", "SC" ) );
+                out.print( values.build() );
                 
             } else if( respFromBank.equals("Saldo insuficiente") ) {
-                out.print("SinSaldo");
+                values.add(Json.createObjectBuilder()
+                    .add("RESP", "SinSaldo" ) );
+                out.print( values.build() );
                 
             } else {
-                out.print("OK");            
+                generarBoleto( respFromBank, evento.getString("evento") );
+                values.add(Json.createObjectBuilder()
+                    .add("RESP", "OK" )
+                    .add("pdf", respFromBank ) );
+                out.print( values.build() );
             }
             
             out.close();
         } catch (IOException ex) {
             Logger.getLogger(Ticket.class.getName()).log(Level.SEVERE, null, ex); 
         } 
-        
-        
-//        try{
-//            /*
-//            String password = "test";
-//            String salt;
-//            int pswdIterations = 65536  ;
-//            int keySize = 128;
-//            byte[] ivBytes;
-//            
-//            salt = generateSalt();      
-//            byte[] saltBytes = salt.getBytes("UTF-8");
-//            
-//            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-//        PBEKeySpec spec = new PBEKeySpec(
-//                password.toCharArray(), 
-//                saltBytes, 
-//                pswdIterations, 
-//                keySize
-//                );
-// 
-//        SecretKey secretKey = factory.generateSecret(spec);
-//        
-//            String xml= new xmlcuenta().crearXML() ;
-//            String cuenta= cifrar(xml,secretKey.getEncoded());
-//            CifradorRSA cifrador = new CifradorRSA();
-//        KeyPair llavesCliente = cifrador.generarLlaves(2048);
-//        PublicKey llavePublicaBanco = (PublicKey) cifrador.leerLlave("llaves/public.key", CifradorRSA.TipoLlave.PUBLICA);
-//            */
-//            /* Este bloque para verificar que el cifrado AES sobre la tarejta
-//            funciones correctamente. Este descifrado lo debe hacer el banco.2A396E5EF3
-//            Aqui puede realizarse porque aun falta el cifrado RSA de la clave temporal
-//            */
-//            byte[] claveTemporal = Base64.getDecoder().decode(claveBase64.getBytes("UTF-8"));
-//            //String jsonTarjeta  = descifrar(claveTemporal, tarjeta);
-//            //System.out.println("Tarjeta descifrada: " + jsonTarjeta);
-//            PrintWriter out = response.getWriter();
-//            out.print("OK");
-//            /*
-//            String xml= new xmlcuenta().crearXML() ;
-//            String cuenta = this.cifrar(request, response, xml);
-//            conectarConBanco(request, response);
-//            */
-//            //System.out.println(cuenta);
-//        }catch(Exception ioe){
-//            ioe.printStackTrace();
-//        }
     }
     
     public String generateSalt() {
@@ -340,6 +317,49 @@ public class Ticket extends HttpServlet {
         random.nextBytes(bytes);
         String s = new String(bytes);
         return s;
+    }
+    
+    private void generarBoleto( String cliente, String evento ) {
+        Boleto b = new Boleto();
+        Evento e = consulta.obtenerEvento( evento );
+        
+        b.setAsiento( Integer.toString( new Random().nextInt( e.getAsientos() ) ) );
+        b.setFecha( e.getFecha().toString() );
+        b.setLugar( e.getLugar() );
+        b.setNombre( cliente );
+        b.setNombreEvento( e.getNombre() );
+        b.setPrecio( Double.toString( e.getPrecio() ) );
+        b.setReferencia( Integer.toString( new Random().nextInt( 10000 ) ) );
+       
+        LinkedList<Boleto> boleto = new LinkedList<>();
+        boleto.add( b );
+        
+        crearReciboDePago( boleto );
+        System.out.println("BOLETO ERMINADO!");
+    }
+    
+    private void crearReciboDePago( LinkedList<Boleto> ticket ) {
+        String nombreArchivo = ticket.get(0).getNombre().trim();
+        
+        try {
+            /*Se indica la plantilla jasper */
+            JasperReport reporte = ( JasperReport ) JRLoader.loadObject( new File( rutaJasper ) );
+            Map parametros = new HashMap();
+            
+            parametros.put("logo", logo );
+            parametros.put("code", code );
+            parametros.put("publicidad", publicidad );
+            
+            JasperPrint jPrint = JasperFillManager.fillReport(reporte, parametros, new JRBeanCollectionDataSource( ticket ) );
+
+            Exporter exporter = new JRPdfExporter();
+            exporter.setExporterInput( new SimpleExporterInput( jPrint ) );
+            exporter.setExporterOutput( new SimpleOutputStreamExporterOutput( pdfs + File.separator + nombreArchivo + ".pdf") );
+            exporter.exportReport();
+
+        } catch (JRException e) {
+            e.printStackTrace();
+        }
     }
     
     private JsonArray crearJSON( LinkedList<Evento> eventos ) {
